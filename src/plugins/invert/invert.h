@@ -29,13 +29,14 @@ public:
 
     bool isActive() const override;
     bool provides(Feature) override;
+    bool perform(Feature feature, const QVariantList &arguments) override;
     int requestedEffectChainPosition() const override;
 
     static bool supported();
 
 public Q_SLOTS:
     void toggleScreenInversion();
-    void toggleWindow();
+    void toggleWindow(KWin::EffectWindow *w);
 
     void slotWindowAdded(KWin::EffectWindow *w);
     void slotWindowClosed(KWin::EffectWindow *w);

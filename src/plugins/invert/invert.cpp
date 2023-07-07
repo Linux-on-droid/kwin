@@ -49,7 +49,9 @@ InvertEffect::InvertEffect()
     b->setText(i18n("Toggle Invert Effect on Window"));
     KGlobalAccel::self()->setDefaultShortcut(b, QList<QKeySequence>() << (Qt::CTRL | Qt::META | Qt::Key_U));
     KGlobalAccel::self()->setShortcut(b, QList<QKeySequence>() << (Qt::CTRL | Qt::META | Qt::Key_U));
-    connect(b, &QAction::triggered, this, &InvertEffect::toggleWindow);
+    connect(b, &QAction::triggered, this, [this] {
+        InvertEffect::toggleWindow(effects->activeWindow());
+    });
 
     QAction *c = new QAction(this);
     c->setObjectName(QStringLiteral("Invert Screen Colors"));
@@ -131,22 +133,22 @@ void InvertEffect::toggleScreenInversion()
     effects->addRepaintFull();
 }
 
-void InvertEffect::toggleWindow()
+void InvertEffect::toggleWindow(KWin::EffectWindow *window)
 {
-    if (!effects->activeWindow()) {
+    if (!window) {
         return;
     }
-    if (!m_windows.contains(effects->activeWindow())) {
-        m_windows.append(effects->activeWindow());
+    if (!m_windows.contains(window)) {
+        m_windows.append(window);
     } else {
-        m_windows.removeOne(effects->activeWindow());
+        m_windows.removeOne(window);
     }
-    if (isInvertable(effects->activeWindow())) {
-        invert(effects->activeWindow());
+    if (isInvertable(window)) {
+        invert(window);
     } else {
-        uninvert(effects->activeWindow());
+        uninvert(window);
     }
-    effects->activeWindow()->addRepaintFull();
+    window->addRepaintFull();
 }
 
 bool InvertEffect::isActive() const
@@ -157,6 +159,19 @@ bool InvertEffect::isActive() const
 bool InvertEffect::provides(Feature f)
 {
     return f == ScreenInversion;
+}
+
+bool KWin::InvertEffect::perform(Feature feature, const QVariantList &arguments)
+{
+    if (feature != ScreenInversion) {
+        return false;
+    }
+    for (const auto &arg : arguments) {
+        if (auto window = arg.value<KWin::EffectWindow *>()) {
+            toggleWindow(window);
+        }
+    }
+    return true;
 }
 
 } // namespace
