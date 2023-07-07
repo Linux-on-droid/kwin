@@ -212,6 +212,10 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-screen-edge-v1.xml
     BASENAME kde-screen-edge-v1
 )
+ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
+    PROTOCOL ${PROJECT_SOURCE_DIR}/src/wayland/protocols/system-bell-v1.xml
+    BASENAME system-bell-v1
+)
 
 target_sources(kwin PRIVATE
     abstract_data_source.cpp
@@ -274,6 +278,7 @@ target_sources(kwin PRIVATE
     subcompositor_interface.cpp
     surface_interface.cpp
     surfacerole.cpp
+    systembell_v1_interface.cpp
     tablet_v2_interface.cpp
     tearingcontrol_v1_interface.cpp
     textinput.cpp
@@ -350,6 +355,7 @@ install(FILES
     slide_interface.h
     subcompositor_interface.h
     surface_interface.h
+    systembell_v1_interface.h
     tablet_v2_interface.h
     tearingcontrol_v1_interface.h
     textinput_v1_interface.h

@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Category": "Accessibility",
+        "Description": "Visual Bell",
+        "License": "GPL",
+        "Name": "Visual Bell",
+        "EnabledByDefault": true
+    }
+}
