@@ -10,13 +10,43 @@
 #include "wayland/surface_interface.h"
 #include "wayland/systembell_v1_interface.h"
 #include "wayland_server.h"
+#include "workspace.h"
 
 #include <KNotification>
+
+#define explicit dont_use_cxx_explicit
+#include <xcb/xkb.h>
+#undef explicit
 
 using namespace Qt::StringLiterals;
 
 namespace KWin
 {
+
+class BellFilter : public X11EventFilter
+{
+public:
+    BellFilter(int event, SystemBell *bell);
+    SystemBell *bell;
+    bool event(xcb_generic_event_t *event) override;
+};
+
+BellFilter::BellFilter(int event, KWin::SystemBell *bell)
+    : X11EventFilter(event)
+    , bell(bell)
+{
+}
+
+bool BellFilter::event(xcb_generic_event_t *event)
+{
+    auto bellEvent = reinterpret_cast<xcb_xkb_bell_notify_event_t *>(event);
+    if (bellEvent->xkbType == XCB_XKB_BELL_NOTIFY) {
+        bell->xkbRing(bellEvent);
+        return true;
+    }
+    return false;
+}
+
 SystemBell::SystemBell()
     : m_configWatcher(KConfigWatcher::create(KSharedConfig::openConfig(u"kaccessrc"_qs)))
 {
@@ -31,6 +61,20 @@ SystemBell::SystemBell()
         }
     });
     loadConfig(m_configWatcher->config()->group("Bell"));
+
+    if (auto connection = kwinApp()->x11Connection()) {
+        const xcb_query_extension_reply_t *extension = xcb_get_extension_data(connection, &xcb_xkb_id);
+        if (extension->present) {
+            xcb_xkb_select_events(connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_EVENT_TYPE_BELL_NOTIFY, 0, XCB_XKB_EVENT_TYPE_BELL_NOTIFY, 0, 0, nullptr);
+            uint8_t perKeyRepeat[32] = {0};
+            xcb_xkb_set_controls(connection, XCB_XKB_ID_USE_CORE_KBD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, XCB_XKB_BOOL_CTRL_AUDIBLE_BELL_MASK, XCB_XKB_BOOL_CTRL_AUDIBLE_BELL_MASK, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, perKeyRepeat);
+            m_bellFilter = std::make_unique<BellFilter>(extension->first_event, this);
+        }
+    }
+}
+
+SystemBell::~SystemBell()
+{
 }
 
 void SystemBell::audibleBell()
@@ -66,11 +110,19 @@ void SystemBell::ringSurface(KWaylandServer::SurfaceInterface *surface)
 void SystemBell::ringClient(KWaylandServer::ClientConnection *client)
 {
     audibleBell();
-    const auto windows = KWin::waylandServer()->windows();
+    const auto windows = waylandServer()->windows();
     for (const auto window : windows) {
         if (window->surface()->client() == client) {
             visualBell(window->effectWindow());
         }
+    }
+}
+
+void SystemBell::xkbRing(xcb_xkb_bell_notify_event_t *event)
+{
+    if (!event->eventOnly) {
+        audibleBell();
+        visualBell(event->window ? effects->findWindow(event->window) : workspace()->activeWindow()->effectWindow());
     }
 }
 

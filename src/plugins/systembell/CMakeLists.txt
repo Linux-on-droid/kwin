@@ -6,4 +6,4 @@ target_sources(SystemBellPlugin PRIVATE
     systembell.cpp
 )
 
-target_link_libraries(SystemBellPlugin PRIVATE kwin KF6::Notifications)
+target_link_libraries(SystemBellPlugin PRIVATE kwin XCB::XKB KF6::Notifications)
