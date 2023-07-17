@@ -265,8 +265,14 @@ bool DrmPipeline::prepareAtomicModeset(DrmAtomicCommit *commit)
     } else if (m_pending.colorimetry != NamedColorimetry::BT709) {
         return false;
     }
-    if (m_connector->scalingMode.isValid() && m_connector->scalingMode.hasEnum(DrmConnector::ScalingMode::None)) {
-        commit->addEnum(m_connector->scalingMode, DrmConnector::ScalingMode::None);
+    if (m_connector->scalingMode.isValid()) {
+        // amdgpu has several bugs with scaling mode set to full aspect,
+        // so leave scaling up to the display on AMD GPUs
+        if (m_connector->scalingMode.hasEnum(DrmConnector::ScalingMode::Full_Aspect) && !gpu()->isAMD()) {
+            commit->addEnum(m_connector->scalingMode, DrmConnector::ScalingMode::Full_Aspect);
+        } else if (m_connector->scalingMode.hasEnum(DrmConnector::ScalingMode::None)) {
+            commit->addEnum(m_connector->scalingMode, DrmConnector::ScalingMode::None);
+        }
     }
 
     commit->addProperty(m_pending.crtc->active, 1);

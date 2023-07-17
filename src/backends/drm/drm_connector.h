@@ -98,9 +98,13 @@ public:
         RightUp = 3
     };
     enum class ScalingMode : uint64_t {
+        /* scaling is done by the display, in whatever way it wants */
         None = 0,
+        /* scaling is done by the gpu, content is stretched */
         Full = 1,
+        /* scaling is done by the gpu, content is centered with black borders */
         Center = 2,
+        /* scaling is done by the gpu, content is scaled while preserving the aspect ratio */
         Full_Aspect = 3
     };
     enum class Colorspace : uint64_t {
