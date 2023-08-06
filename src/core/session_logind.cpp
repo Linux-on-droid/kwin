@@ -143,6 +143,11 @@ bool LogindSession::isActive() const
     return m_isActive;
 }
 
+bool LogindSession::isSleeping() const
+{
+    return m_isSleeping;
+}
+
 LogindSession::Capabilities LogindSession::capabilities() const
 {
     return Capability::SwitchTerminal;
@@ -342,6 +347,8 @@ void LogindSession::handlePropertiesChanged(const QString &interfaceName, const 
 
 void LogindSession::handlePrepareForSleep(bool sleep)
 {
+    m_isSleeping = sleep;
+
     if (!sleep) {
         Q_EMIT awoke();
     }
