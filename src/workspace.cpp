@@ -9,6 +9,7 @@
 
     SPDX-License-Identifier: GPL-2.0-or-later
 */
+#include <config-kwin.h>
 // own
 #include "workspace.h"
 // kwin libs
@@ -23,6 +24,7 @@
 #include "composite.h"
 #include "core/outputbackend.h"
 #include "core/outputconfiguration.h"
+#include "core/session.h"
 #include "cursor.h"
 #include "dbusinterface.h"
 #include "effects.h"
@@ -62,6 +64,9 @@
 #include <KConfig>
 #include <KConfigGroup>
 #include <KLocalizedString>
+#if KWIN_BUILD_NOTIFICATIONS
+#include <KNotification>
+#endif
 #include <KStartupInfo>
 // Qt
 #include <QtConcurrentRun>
@@ -1286,6 +1291,63 @@ void Workspace::slotOutputBackendOutputsQueried()
         updateOutputConfiguration();
     }
     updateOutputs();
+
+    emitConnectedOutputNotification();
+}
+
+void Workspace::emitConnectedOutputNotification()
+{
+#if KWIN_BUILD_NOTIFICATIONS
+    const auto availableOutputs = kwinApp()->outputBackend()->outputs();
+
+    auto oldConnectedOutputs = m_connectedOutputs;
+
+    m_connectedOutputs.clear();
+    for (Output *output : availableOutputs) {
+        if (output->dpmsMode() != Output::DpmsMode::On) {
+            // Some outputs disconnect when Off, ignore them entirely.
+            oldConnectedOutputs.removeOne(output->uuid());
+            continue;
+        }
+        m_connectedOutputs.append(output->uuid());
+    }
+
+    // Don't emit on initial output population.
+    if (oldConnectedOutputs.isEmpty()) {
+        return;
+    }
+
+    // Some outputs disconnect on system sleep, don't notify during this period.
+    if (kwinApp()->session()->isSleeping()) {
+        return;
+    }
+
+    const QSet<QUuid> oldConnectedOutputsSet(oldConnectedOutputs.constBegin(), oldConnectedOutputs.constEnd());
+    const QSet<QUuid> connectedOutputsSet(m_connectedOutputs.constBegin(), m_connectedOutputs.constEnd());
+
+    const bool outputWasAdded = !((connectedOutputsSet - oldConnectedOutputsSet).isEmpty());
+    const bool outputWasRemoved = !((oldConnectedOutputsSet - connectedOutputsSet).isEmpty());
+
+    if (outputWasAdded != outputWasRemoved) {
+        if (outputWasAdded) {
+            // TODO would be nice for accessibility purposes to include the display name
+            // but by default the deviceAdded/deviceRemoved events only play a sound.
+            KNotification::event(QStringLiteral("deviceAdded"),
+                                 i18nc("@title:notifications", "Display Detected"),
+                                 i18n("A display has been plugged in."),
+                                 QStringLiteral("video-display"),
+                                 nullptr,
+                                 KNotification::DefaultEvent);
+        } else if (outputWasRemoved) {
+            KNotification::event(QStringLiteral("deviceRemoved"),
+                                 i18nc("@title:notifications", "Display Removed"),
+                                 i18n("A display has been plugged unplugged."),
+                                 QStringLiteral("video-display"),
+                                 nullptr,
+                                 KNotification::DefaultEvent);
+        }
+    }
+#endif
 }
 
 void Workspace::updateOutputs(const QVector<Output *> &outputOrder)

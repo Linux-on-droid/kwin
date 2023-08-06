@@ -609,6 +609,7 @@ private:
 
     void updateOutputConfiguration();
     void updateOutputs(const QVector<Output *> &outputOrder = {});
+    void emitConnectedOutputNotification();
 
     struct Constraint
     {
@@ -634,6 +635,9 @@ private:
     Output *m_activeOutput = nullptr;
     Output *m_activeCursorOutput = nullptr;
     QVector<Output *> m_outputOrder;
+    // Connected output UUIDs, regardless of whether they are enabled or configured.
+    // Used for playing an (un)plug sound.
+    QList<QUuid> m_connectedOutputs;
 
     Window *m_activeWindow;
     Window *m_lastActiveWindow;
