@@ -105,7 +105,7 @@ void DrmCommitThread::submit()
 {
     auto &commit = m_commits.front();
     const auto vrr = commit->isVrr();
-    const bool success = commit->commit();
+    const bool success = commit->commit(m_currentState.get());
     if (success) {
         m_vrr = vrr.value_or(m_vrr);
         m_committed = std::move(commit);
@@ -261,9 +261,12 @@ DrmCommitThread::~DrmCommitThread()
 void DrmCommitThread::addCommit(std::unique_ptr<DrmAtomicCommit> &&commit)
 {
     std::unique_lock lock(m_mutex);
+    const bool tearing = commit->tearing();
     m_commits.push_back(std::move(commit));
     const auto now = std::chrono::steady_clock::now();
-    if (m_vrr && now >= m_lastPageflip + m_minVblankInterval) {
+    if (tearing) {
+        m_targetPageflipTime = now;
+    } else if (m_vrr && now >= m_lastPageflip + m_minVblankInterval) {
         m_targetPageflipTime = now;
     } else {
         m_targetPageflipTime = estimateNextVblank(now);
@@ -296,7 +299,17 @@ void DrmCommitThread::pageFlipped(std::chrono::nanoseconds timestamp)
 {
     std::unique_lock lock(m_mutex);
     m_lastPageflip = TimePoint(timestamp);
-    m_committed.reset();
+    if (auto atomic = dynamic_cast<DrmAtomicCommit *>(m_committed.get())) {
+        if (m_currentState) {
+            m_currentState->merge(atomic);
+        } else {
+            m_currentState.reset(atomic);
+            m_committed.release();
+        }
+    } else {
+        m_committed.reset();
+        m_currentState.reset();
+    }
     if (!m_commits.empty()) {
         m_targetPageflipTime = estimateNextVblank(std::chrono::steady_clock::now());
         m_commitPending.notify_all();
@@ -309,6 +322,12 @@ bool DrmCommitThread::pageflipsPending()
     return !m_commits.empty() || m_committed;
 }
 
+bool DrmCommitThread::hasCommitsQueued()
+{
+    std::unique_lock lock(m_mutex);
+    return !m_commits.empty();
+}
+
 TimePoint DrmCommitThread::estimateNextVblank(TimePoint now) const
 {
     // the pageflip timestamp may be in the future
@@ -319,5 +338,10 @@ TimePoint DrmCommitThread::estimateNextVblank(TimePoint now) const
 std::chrono::nanoseconds DrmCommitThread::safetyMargin() const
 {
     return m_safetyMargin;
+}
+
+DrmAtomicCommit *DrmCommitThread::currentStateCommit() const
+{
+    return m_currentState.get();
 }
 }

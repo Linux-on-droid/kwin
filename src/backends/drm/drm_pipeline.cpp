@@ -77,6 +77,13 @@ DrmPipeline::Error DrmPipeline::present(const std::shared_ptr<OutputFrame> &fram
 {
     Q_ASSERT(m_pending.crtc);
     if (gpu()->atomicModeSetting()) {
+        if (m_pending.presentationMode == PresentationMode::Async || m_pending.presentationMode == PresentationMode::AdaptiveAsync) {
+            if (m_commitThread->hasCommitsQueued()) {
+                // with tearing, we can only queue one commit at a time or the atomic test result won't be accurate
+                // because the pending commits will change the atomic state and async pageflips aren't really atomic...
+                return Error::FramePending;
+            }
+        }
         // test the full state, to take pending commits into account
         if (auto err = DrmPipeline::commitPipelinesAtomic({this}, CommitMode::Test, frame, {}); err != Error::None) {
             return err;
@@ -205,6 +212,7 @@ DrmPipeline::Error DrmPipeline::prepareAtomicCommit(DrmAtomicCommit *commit, Com
 DrmPipeline::Error DrmPipeline::prepareAtomicPresentation(DrmAtomicCommit *commit, const std::shared_ptr<OutputFrame> &frame)
 {
     commit->setPresentationMode(m_pending.presentationMode);
+    commit->setTearing(m_pending.presentationMode == PresentationMode::Async || m_pending.presentationMode == PresentationMode::AdaptiveAsync);
     if (m_connector->contentType.isValid()) {
         commit->addEnum(m_connector->contentType, m_pending.contentType);
     }
