@@ -10,7 +10,7 @@ out vec4 fragColor;
 uniform sampler2D src;
 uniform float sdrBrightness;
 
-uniform mat3 matrix1;
+uniform mat4 toXYZD50;
 
 uniform int Bsize;
 uniform sampler1D Bsampler;
@@ -39,7 +39,7 @@ void main()
 {
     vec4 tex = texture(src, texcoord0);
     tex.rgb /= sdrBrightness;
-    tex.rgb = matrix1 * tex.rgb;
+    tex.rgb = (toXYZD50 * vec4(tex.rgb, 1.0)).rgb;
     if (Bsize > 0) {
         tex.rgb = sample1DLut(tex.rgb, Bsampler, Bsize);
     }

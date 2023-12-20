@@ -7,6 +7,7 @@
 #include <optional>
 
 #include <QMatrix3x3>
+#include <QMatrix4x4>
 #include <QVector2D>
 
 #include "kwin_export.h"
@@ -39,26 +40,27 @@ public:
     /**
      * @returns a matrix adapting XYZ values from the source whitepoint to the destination whitepoint with the Bradford transform
      */
-    static QMatrix3x3 chromaticAdaptationMatrix(QVector2D sourceWhitepoint, QVector2D destinationWhitepoint);
+    static QMatrix4x4 chromaticAdaptationMatrix(QVector2D sourceWhitepoint, QVector2D destinationWhitepoint);
+    static QMatrix4x4 blackPointCompensationMatrix(QVector3D sourceBlackpoint, QVector3D destinationBlackpoint, QVector3D whitepoint);
 
-    static QMatrix3x3 calculateToXYZMatrix(QVector3D red, QVector3D green, QVector3D blue, QVector3D white);
+    static QMatrix4x4 calculateToXYZMatrix(QVector3D red, QVector3D green, QVector3D blue, QVector3D white);
 
-    explicit Colorimetry(QVector2D red, QVector2D green, QVector2D blue, QVector2D white);
-    explicit Colorimetry(QVector3D red, QVector3D green, QVector3D blue, QVector3D white);
+    explicit Colorimetry(QVector2D red, QVector2D green, QVector2D blue, QVector2D white, QVector3D black);
+    explicit Colorimetry(QVector3D red, QVector3D green, QVector3D blue, QVector3D white, QVector3D black);
 
     /**
      * @returns a matrix that transforms from the linear RGB representation of colors in this colorimetry to the XYZ representation
      */
-    const QMatrix3x3 &toXYZ() const;
+    const QMatrix4x4 &toXYZ() const;
     /**
      * @returns a matrix that transforms from the XYZ representation to the linear RGB representation of colors in this colorimetry
      */
-    const QMatrix3x3 &fromXYZ() const;
+    const QMatrix4x4 &fromXYZ() const;
     /**
      * @returns a matrix that transforms from linear RGB in this colorimetry to linear RGB in the other colorimetry
      * the rendering intent is relative colorimetric
      */
-    QMatrix3x3 toOther(const Colorimetry &colorimetry) const;
+    QMatrix4x4 toOther(const Colorimetry &colorimetry) const;
     bool operator==(const Colorimetry &other) const;
     bool operator==(NamedColorimetry name) const;
     /**
@@ -70,14 +72,16 @@ public:
     const QVector2D &green() const;
     const QVector2D &blue() const;
     const QVector2D &white() const;
+    const QVector3D &black() const;
 
 private:
     QVector2D m_red;
     QVector2D m_green;
     QVector2D m_blue;
     QVector2D m_white;
-    QMatrix3x3 m_toXYZ;
-    QMatrix3x3 m_fromXYZ;
+    QVector3D m_black;
+    QMatrix4x4 m_toXYZ;
+    QMatrix4x4 m_fromXYZ;
 };
 
 /**
