@@ -79,6 +79,9 @@ Q_SIGNALS:
     void tabletToolEvent(InputRedirection::TabletEventType type, const QPointF &pos,
                          qreal pressure, int xTilt, int yTilt, qreal rotation, bool tipDown,
                          bool tipNear, const TabletToolId &tabletToolId, std::chrono::microseconds time);
+    void tabletToolEventRelative(InputRedirection::TabletEventType type, const QPointF &delta,
+                                 qreal pressure, int xTilt, int yTilt, qreal rotation, bool tipDown,
+                                 bool tipNear, const TabletToolId &tabletToolId, std::chrono::microseconds time);
     void tabletToolButtonEvent(uint button, bool isPressed, const TabletToolId &tabletToolId, std::chrono::microseconds time);
 
     void tabletPadButtonEvent(uint button, bool isPressed, const TabletPadId &tabletPadId, std::chrono::microseconds time);

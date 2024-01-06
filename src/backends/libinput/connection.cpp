@@ -527,10 +527,17 @@ void Connection::processEvents()
 #else
                 const QPointF globalPos;
 #endif
-                Q_EMIT event->device()->tabletToolEvent(tabletEventType,
-                                                        globalPos, tte->pressure(),
-                                                        tte->xTilt(), tte->yTilt(), tte->rotation(),
-                                                        tte->isTipDown(), tte->isNearby(), createTabletId(tte->tool(), event->device()), tte->time());
+                if (tte->device()->isRelative()) {
+                    Q_EMIT event->device()->tabletToolEventRelative(tabletEventType,
+                                                                    tte->delta(), tte->pressure(),
+                                                                    tte->xTilt(), tte->yTilt(), tte->rotation(),
+                                                                    tte->isTipDown(), tte->isNearby(), createTabletId(tte->tool(), event->device()), tte->time());
+                } else {
+                    Q_EMIT event->device()->tabletToolEvent(tabletEventType,
+                                                            globalPos, tte->pressure(),
+                                                            tte->xTilt(), tte->yTilt(), tte->rotation(),
+                                                            tte->isTipDown(), tte->isNearby(), createTabletId(tte->tool(), event->device()), tte->time());
+                }
             }
             break;
         }

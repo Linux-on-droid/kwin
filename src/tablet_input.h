@@ -44,6 +44,12 @@ public:
                          qreal pressure, int xTilt, int yTilt, qreal rotation, bool tipDown,
                          bool tipNear, const TabletToolId &tabletToolId,
                          std::chrono::microseconds time);
+
+    void tabletToolEventRelative(KWin::InputRedirection::TabletEventType type, const QPointF &delta,
+                                 qreal pressure, int xTilt, int yTilt, qreal rotation, bool tipDown,
+                                 bool tipNear, const TabletToolId &tabletToolId,
+                                 std::chrono::microseconds time);
+
     void tabletToolButtonEvent(uint button, bool isPressed, const TabletToolId &tabletToolId, std::chrono::microseconds time);
 
     void tabletPadButtonEvent(uint button, bool isPressed, const TabletPadId &tabletPadId, std::chrono::microseconds time);

@@ -92,6 +92,53 @@ void TabletInputRedirection::tabletToolEvent(KWin::InputRedirection::TabletEvent
     m_tipNear = tipNear;
 }
 
+void TabletInputRedirection::tabletToolEventRelative(KWin::InputRedirection::TabletEventType type, const QPointF &delta,
+                                                     qreal pressure, int xTilt, int yTilt, qreal rotation, bool tipDown,
+                                                     bool tipNear, const TabletToolId &tabletToolId,
+                                                     std::chrono::microseconds time)
+{
+    if (!inited()) {
+        return;
+    }
+    input()->setLastInputHandler(this);
+    m_lastPosition += delta;
+
+    QEvent::Type t;
+    switch (type) {
+    case InputRedirection::Axis:
+        t = QEvent::TabletMove;
+        break;
+    case InputRedirection::Tip:
+        t = tipDown ? QEvent::TabletPress : QEvent::TabletRelease;
+        break;
+    case InputRedirection::Proximity:
+        t = tipNear ? QEvent::TabletEnterProximity : QEvent::TabletLeaveProximity;
+        break;
+    }
+
+    update();
+    workspace()->setActiveCursorOutput(m_lastPosition);
+
+    const auto button = m_tipDown ? Qt::LeftButton : Qt::NoButton;
+
+    // TODO: Not correct, but it should work fine. In long term, we need to stop using QTabletEvent.
+    const QPointingDevice *dev = QPointingDevice::primaryPointingDevice();
+    TabletEvent ev(t, dev, m_lastPosition, m_lastPosition, pressure,
+                   xTilt, yTilt,
+                   0, // tangentialPressure
+                   rotation,
+                   0, // z
+                   Qt::NoModifier, button, button, tabletToolId);
+
+    ev.setTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(time).count());
+    input()->processSpies(std::bind(&InputEventSpy::tabletToolEvent, std::placeholders::_1, &ev));
+    input()->processFilters(
+        std::bind(&InputEventFilter::tabletToolEvent, std::placeholders::_1, &ev));
+
+    m_tipDown = tipDown;
+    m_tipNear = tipNear;
+}
+
 void KWin::TabletInputRedirection::tabletToolButtonEvent(uint button, bool isPressed,
                                                          const TabletToolId &tabletToolId, std::chrono::microseconds time)
 {

@@ -144,6 +144,8 @@ class KWIN_EXPORT Device : public InputDevice
     Q_PROPERTY(bool defaultMapToWorkspace READ defaultMapToWorkspace CONSTANT)
     Q_PROPERTY(bool mapToWorkspace READ isMapToWorkspace WRITE setMapToWorkspace NOTIFY mapToWorkspaceChanged)
 
+    Q_PROPERTY(bool relative READ isRelative WRITE setRelative NOTIFY relativeChanged)
+
 public:
     explicit Device(libinput_device *device, QObject *parent = nullptr);
     ~Device() override;
@@ -642,6 +644,18 @@ public:
 
     void setMapToWorkspace(bool mapToWorkspace);
 
+    bool isRelative() const
+    {
+        return m_relative;
+    }
+
+    void setRelative(bool relative);
+
+    bool defaultRelative() const
+    {
+        return defaultValue("RelativeMode", false);
+    }
+
     /**
      * Gets the Device for @p native. @c null if there is no Device for @p native.
      */
@@ -668,6 +682,7 @@ Q_SIGNALS:
     void clickMethodChanged();
     void outputAreaChanged();
     void mapToWorkspaceChanged();
+    void relativeChanged();
 
 private:
     template<typename T>
@@ -756,6 +771,7 @@ private:
     LEDs m_leds;
     QRectF m_outputArea = QRectF(0, 0, 1, 1);
     bool m_mapToWorkspace = false;
+    bool m_relative;
 };
 
 }

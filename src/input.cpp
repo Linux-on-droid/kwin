@@ -3062,6 +3062,8 @@ void InputRedirection::addInputDevice(InputDevice *device)
 
     connect(device, &InputDevice::tabletToolEvent,
             m_tablet, &TabletInputRedirection::tabletToolEvent);
+    connect(device, &InputDevice::tabletToolEventRelative,
+            m_tablet, &TabletInputRedirection::tabletToolEventRelative);
     connect(device, &InputDevice::tabletToolButtonEvent,
             m_tablet, &TabletInputRedirection::tabletToolButtonEvent);
     connect(device, &InputDevice::tabletPadButtonEvent,
