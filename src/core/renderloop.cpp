@@ -236,6 +236,9 @@ std::chrono::nanoseconds RenderLoop::nextPresentationTimestamp() const
 
 void RenderLoop::setPresentationMode(PresentationMode mode)
 {
+    if (d->presentationMode != mode) {
+        qWarning() << "presentation mode switched to" << mode;
+    }
     d->presentationMode = mode;
 }
 

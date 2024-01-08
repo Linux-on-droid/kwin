@@ -95,6 +95,7 @@ private:
     std::unordered_set<DrmPlane *> m_planes;
     std::optional<bool> m_vrr;
     bool m_tearing = false;
+    std::vector<const DrmProperty *> props;
     std::unordered_map<uint32_t /* object */, std::unordered_map<uint32_t /* property */, uint64_t /* value */>> m_properties;
     bool m_cursorOnly = false;
     bool m_modeset = false;
