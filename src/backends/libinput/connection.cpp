@@ -23,6 +23,7 @@
 #include "core/session.h"
 #include "input_event.h"
 #include "libinput_logging.h"
+#include "utils/cubic_curve.h"
 #include "utils/realtime.h"
 #include "utils/udev.h"
 
@@ -527,8 +528,11 @@ void Connection::processEvents()
 #else
                 const QPointF globalPos;
 #endif
+                const qreal pressure = tte->pressure();
+                const qreal newPressure = event->device()->pressureCurve()->value(pressure);
+
                 Q_EMIT event->device()->tabletToolEvent(tabletEventType,
-                                                        globalPos, tte->pressure(),
+                                                        globalPos, newPressure,
                                                         tte->xTilt(), tte->yTilt(), tte->rotation(),
                                                         tte->isTipDown(), tte->isNearby(), createTabletId(tte->tool(), event->device()), tte->time());
             }
