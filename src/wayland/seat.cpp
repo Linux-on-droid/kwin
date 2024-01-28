@@ -683,7 +683,7 @@ bool SeatInterface::isPointerButtonPressed(quint32 button) const
     return it.value() == SeatInterfacePrivate::Pointer::State::Pressed;
 }
 
-void SeatInterface::notifyPointerAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, PointerAxisSource source, PointerAxisRelativeDirection direction)
+void SeatInterface::notifyPointerAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, InputDeviceAxisSource source, InputDeviceAxisRelativeDirection direction)
 {
     if (!d->pointer) {
         return;

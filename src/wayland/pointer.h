@@ -22,8 +22,8 @@ class PointerInterfacePrivate;
 class SeatInterface;
 class SurfaceInterface;
 
-enum class PointerAxisSource;
-enum class PointerAxisRelativeDirection;
+enum class InputDeviceAxisSource;
+enum class InputDeviceAxisRelativeDirection;
 enum class PointerButtonState : quint32;
 
 using PointerCursor = std::variant<PointerSurfaceCursor *, QByteArray>;
@@ -60,7 +60,7 @@ public:
     void sendEnter(SurfaceInterface *surface, const QPointF &position, quint32 serial);
     void sendLeave(quint32 serial);
     void sendButton(quint32 button, PointerButtonState state, quint32 serial);
-    void sendAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, PointerAxisSource source, PointerAxisRelativeDirection direction);
+    void sendAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, InputDeviceAxisSource source, InputDeviceAxisRelativeDirection direction);
     void sendMotion(const QPointF &position);
     void sendFrame();
 

@@ -222,10 +222,10 @@ void CompositorWindow::wheelEvent(QWheelEvent *event)
     m_seat->setTimestamp(std::chrono::milliseconds(event->timestamp()));
     const QPoint &angle = event->angleDelta() / (8 * 15);
     if (angle.x() != 0) {
-        m_seat->notifyPointerAxis(Qt::Horizontal, angle.x(), 1, KWin::PointerAxisSource::Wheel);
+        m_seat->notifyPointerAxis(Qt::Horizontal, angle.x(), 1, KWin::InputDeviceAxisSource::Wheel);
     }
     if (angle.y() != 0) {
-        m_seat->notifyPointerAxis(Qt::Vertical, angle.y(), 1, KWin::PointerAxisSource::Wheel);
+        m_seat->notifyPointerAxis(Qt::Vertical, angle.y(), 1, KWin::InputDeviceAxisSource::Wheel);
     }
     m_seat->notifyPointerFrame();
 }

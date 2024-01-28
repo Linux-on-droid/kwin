@@ -118,18 +118,18 @@ WaylandInputDevice::WaylandInputDevice(KWayland::Client::Pointer *pointer, Wayla
     });
     // TODO: Send discreteDelta and source as well.
     connect(pointer, &Pointer::axisChanged, this, [this](quint32 time, Pointer::Axis nativeAxis, qreal delta) {
-        InputRedirection::PointerAxis axis;
+        InputDeviceAxis axis;
         switch (nativeAxis) {
         case Pointer::Axis::Horizontal:
-            axis = InputRedirection::PointerAxisHorizontal;
+            axis = InputDeviceAxis::Horizontal;
             break;
         case Pointer::Axis::Vertical:
-            axis = InputRedirection::PointerAxisVertical;
+            axis = InputDeviceAxis::Vertical;
             break;
         default:
             Q_UNREACHABLE();
         }
-        Q_EMIT pointerAxisChanged(axis, delta, 0, InputRedirection::PointerAxisSourceUnknown, std::chrono::milliseconds(time), this);
+        Q_EMIT pointerAxisChanged(axis, delta, 0, InputDeviceAxisSource::Unknown, InputDeviceAxisRelativeDirection::Normal, std::chrono::milliseconds(time), this);
     });
 
     connect(pointer, &Pointer::frame, this, [this]() {

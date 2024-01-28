@@ -81,23 +81,6 @@ using namespace std::literals;
 namespace KWin
 {
 
-static PointerAxisSource kwinAxisSourceToKWaylandAxisSource(InputRedirection::PointerAxisSource source)
-{
-    switch (source) {
-    case InputRedirection::PointerAxisSourceWheel:
-        return PointerAxisSource::Wheel;
-    case InputRedirection::PointerAxisSourceFinger:
-        return PointerAxisSource::Finger;
-    case InputRedirection::PointerAxisSourceContinuous:
-        return PointerAxisSource::Continuous;
-    case InputRedirection::PointerAxisSourceWheelTilt:
-        return PointerAxisSource::WheelTilt;
-    case InputRedirection::PointerAxisSourceUnknown:
-    default:
-        return PointerAxisSource::Unknown;
-    }
-}
-
 InputEventFilter::InputEventFilter() = default;
 
 InputEventFilter::~InputEventFilter()
@@ -347,8 +330,8 @@ public:
             seat->setTimestamp(wheelEvent->timestamp());
             seat->notifyPointerAxis(wheelEvent->orientation(), wheelEvent->delta(),
                                     wheelEvent->deltaV120(),
-                                    kwinAxisSourceToKWaylandAxisSource(wheelEvent->axisSource()),
-                                    wheelEvent->inverted() ? PointerAxisRelativeDirection::Inverted : PointerAxisRelativeDirection::Normal);
+                                    wheelEvent->axisSource(),
+                                    wheelEvent->relativeDirection());
         }
         return true;
     }
@@ -1812,8 +1795,8 @@ public:
         seat->setTimestamp(event->timestamp());
         auto _event = static_cast<WheelEvent *>(event);
         seat->notifyPointerAxis(_event->orientation(), _event->delta(), _event->deltaV120(),
-                                kwinAxisSourceToKWaylandAxisSource(_event->axisSource()),
-                                _event->inverted() ? PointerAxisRelativeDirection::Inverted : PointerAxisRelativeDirection::Normal);
+                                _event->axisSource(),
+                                _event->relativeDirection());
         return true;
     }
     bool keyEvent(KeyEvent *event) override
@@ -2654,7 +2637,6 @@ InputRedirection::InputRedirection(QObject *parent)
 {
     qRegisterMetaType<InputRedirection::KeyboardKeyState>();
     qRegisterMetaType<InputRedirection::PointerButtonState>();
-    qRegisterMetaType<InputRedirection::PointerAxis>();
     setupInputBackends();
     connect(kwinApp(), &Application::workspaceCreated, this, &InputRedirection::setupWorkspace);
 }

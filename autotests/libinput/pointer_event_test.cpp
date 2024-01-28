@@ -163,12 +163,12 @@ void TestLibinputPointerEvent::testScrollWheel()
     auto pe = dynamic_cast<PointerEvent *>(event.get());
     QVERIFY(pe);
     QCOMPARE(pe->type(), LIBINPUT_EVENT_POINTER_SCROLL_WHEEL);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisHorizontal), horizontal);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisVertical), vertical);
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisHorizontal), value.x());
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisVertical), value.y());
-    QCOMPARE(pe->scrollValueV120(KWin::InputRedirection::PointerAxisHorizontal), valueV120.x());
-    QCOMPARE(pe->scrollValueV120(KWin::InputRedirection::PointerAxisVertical), valueV120.y());
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Horizontal), horizontal);
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Vertical), vertical);
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Horizontal), value.x());
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Vertical), value.y());
+    QCOMPARE(pe->scrollValueV120(KWin::InputDeviceAxis::Horizontal), valueV120.x());
+    QCOMPARE(pe->scrollValueV120(KWin::InputDeviceAxis::Vertical), valueV120.y());
     QCOMPARE(pe->time(), pointerEvent->time);
 }
 
@@ -207,10 +207,10 @@ void TestLibinputPointerEvent::testScrollFinger()
     auto pe = dynamic_cast<PointerEvent *>(event.get());
     QVERIFY(pe);
     QCOMPARE(pe->type(), LIBINPUT_EVENT_POINTER_SCROLL_FINGER);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisHorizontal), horizontal);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisVertical), vertical);
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisHorizontal), value.x());
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisVertical), value.y());
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Horizontal), horizontal);
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Vertical), vertical);
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Horizontal), value.x());
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Vertical), value.y());
     QCOMPARE(pe->time(), pointerEvent->time);
 }
 
@@ -246,10 +246,10 @@ void TestLibinputPointerEvent::testScrollContinuous()
     auto pe = dynamic_cast<PointerEvent *>(event.get());
     QVERIFY(pe);
     QCOMPARE(pe->type(), LIBINPUT_EVENT_POINTER_SCROLL_CONTINUOUS);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisHorizontal), horizontal);
-    QCOMPARE(pe->axis().contains(KWin::InputRedirection::PointerAxisVertical), vertical);
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisHorizontal), value.x());
-    QCOMPARE(pe->scrollValue(KWin::InputRedirection::PointerAxisVertical), value.y());
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Horizontal), horizontal);
+    QCOMPARE(pe->axis().contains(KWin::InputDeviceAxis::Vertical), vertical);
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Horizontal), value.x());
+    QCOMPARE(pe->scrollValue(KWin::InputDeviceAxis::Vertical), value.y());
     QCOMPARE(pe->time(), pointerEvent->time);
 }
 

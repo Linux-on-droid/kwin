@@ -563,16 +563,17 @@ void X11WindowedBackend::handleButtonPress(xcb_button_press_event_t *event)
         }
         const int delta = (event->detail == XCB_BUTTON_INDEX_4 || event->detail == 6) ? -120 : 120;
         static const qreal s_defaultAxisStepDistance = 10.0;
-        InputRedirection::PointerAxis axis;
+        InputDeviceAxis axis;
         if (event->detail > 5) {
-            axis = InputRedirection::PointerAxisHorizontal;
+            axis = InputDeviceAxis::Horizontal;
         } else {
-            axis = InputRedirection::PointerAxisVertical;
+            axis = InputDeviceAxis::Vertical;
         }
         Q_EMIT m_pointerDevice->pointerAxisChanged(axis,
                                                    delta * s_defaultAxisStepDistance,
                                                    delta,
-                                                   InputRedirection::PointerAxisSourceUnknown,
+                                                   InputDeviceAxisSource::Unknown,
+                                                   InputDeviceAxisRelativeDirection::Normal,
                                                    std::chrono::milliseconds(event->time),
                                                    m_pointerDevice.get());
         Q_EMIT m_pointerDevice->pointerFrame(m_pointerDevice.get());

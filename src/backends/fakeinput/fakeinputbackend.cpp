@@ -136,21 +136,21 @@ void FakeInputBackendPrivate::org_kde_kwin_fake_input_axis(Resource *resource, u
         return;
     }
 
-    InputRedirection::PointerAxis nativeAxis;
+    InputDeviceAxis nativeAxis;
     switch (axis) {
     case WL_POINTER_AXIS_HORIZONTAL_SCROLL:
-        nativeAxis = InputRedirection::PointerAxisHorizontal;
+        nativeAxis = InputDeviceAxis::Horizontal;
         break;
 
     case WL_POINTER_AXIS_VERTICAL_SCROLL:
-        nativeAxis = InputRedirection::PointerAxisVertical;
+        nativeAxis = InputDeviceAxis::Vertical;
         break;
 
     default:
         return;
     }
 
-    Q_EMIT device->pointerAxisChanged(nativeAxis, wl_fixed_to_double(value), 0, InputRedirection::PointerAxisSourceUnknown, currentTime(), device);
+    Q_EMIT device->pointerAxisChanged(nativeAxis, wl_fixed_to_double(value), 0, InputDeviceAxisSource::Unknown, InputDeviceAxisRelativeDirection::Normal, currentTime(), device);
     Q_EMIT device->pointerFrame(device);
 }
 

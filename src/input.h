@@ -74,17 +74,6 @@ public:
         PointerButtonReleased,
         PointerButtonPressed
     };
-    enum PointerAxis {
-        PointerAxisVertical,
-        PointerAxisHorizontal
-    };
-    enum PointerAxisSource {
-        PointerAxisSourceUnknown,
-        PointerAxisSourceWheel,
-        PointerAxisSourceFinger,
-        PointerAxisSourceContinuous,
-        PointerAxisSourceWheelTilt
-    };
     enum KeyboardKeyState {
         KeyboardKeyReleased,
         KeyboardKeyPressed,
@@ -267,13 +256,6 @@ Q_SIGNALS:
      * @param state The new button state
      */
     void pointerButtonStateChanged(uint32_t button, InputRedirection::PointerButtonState state);
-    /**
-     * @brief Emitted when a pointer axis changed
-     *
-     * @param axis The axis on which the even occurred
-     * @param delta The delta of the event.
-     */
-    void pointerAxisChanged(InputRedirection::PointerAxis axis, qreal delta);
     /**
      * @brief Emitted when the modifiers changes.
      *
@@ -561,5 +543,3 @@ inline QList<InputDevice *> InputRedirection::devices() const
 
 Q_DECLARE_METATYPE(KWin::InputRedirection::KeyboardKeyState)
 Q_DECLARE_METATYPE(KWin::InputRedirection::PointerButtonState)
-Q_DECLARE_METATYPE(KWin::InputRedirection::PointerAxis)
-Q_DECLARE_METATYPE(KWin::InputRedirection::PointerAxisSource)

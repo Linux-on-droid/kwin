@@ -8,6 +8,7 @@
 */
 #pragma once
 
+#include "core/inputdevice.h"
 #include "input.h"
 
 #include <QInputEvent>
@@ -79,7 +80,8 @@ class WheelEvent : public QWheelEvent
 {
 public:
     explicit WheelEvent(const QPointF &pos, qreal delta, qint32 deltaV120, Qt::Orientation orientation,
-                        Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, InputRedirection::PointerAxisSource source,
+                        Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, InputDeviceAxisSource source,
+                        InputDeviceAxisRelativeDirection relativeDirection,
                         std::chrono::microseconds timestamp, InputDevice *device);
 
     Qt::Orientation orientation() const
@@ -97,9 +99,14 @@ public:
         return m_deltaV120;
     }
 
-    InputRedirection::PointerAxisSource axisSource() const
+    InputDeviceAxisSource axisSource() const
     {
         return m_source;
+    }
+
+    InputDeviceAxisRelativeDirection relativeDirection() const
+    {
+        return m_direction;
     }
 
     InputDevice *device() const
@@ -124,7 +131,8 @@ private:
     Qt::Orientation m_orientation;
     qreal m_delta;
     qint32 m_deltaV120;
-    InputRedirection::PointerAxisSource m_source;
+    InputDeviceAxisSource m_source;
+    InputDeviceAxisRelativeDirection m_direction;
     Qt::KeyboardModifiers m_modifiersRelevantForShortcuts = Qt::KeyboardModifiers();
     const std::chrono::microseconds m_timestamp;
 };

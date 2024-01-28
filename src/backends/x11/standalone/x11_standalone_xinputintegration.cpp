@@ -101,10 +101,10 @@ public:
                 input()->pointer()->processButton(BTN_RIGHT, InputRedirection::PointerButtonReleased, std::chrono::milliseconds(e->time));
                 break;
             case XCB_BUTTON_INDEX_4:
-                input()->pointer()->processAxis(InputRedirection::PointerAxisVertical, 120, 1, InputRedirection::PointerAxisSourceWheel, std::chrono::milliseconds(e->time));
+                input()->pointer()->processAxis(InputDeviceAxis::Vertical, 120, 1, InputDeviceAxisSource::Wheel, InputDeviceAxisRelativeDirection::Normal, std::chrono::milliseconds(e->time));
                 break;
             case XCB_BUTTON_INDEX_5:
-                input()->pointer()->processAxis(InputRedirection::PointerAxisVertical, -120, 1, InputRedirection::PointerAxisSourceWheel, std::chrono::milliseconds(e->time));
+                input()->pointer()->processAxis(InputDeviceAxis::Vertical, -120, 1, InputDeviceAxisSource::Wheel, InputDeviceAxisRelativeDirection::Normal, std::chrono::milliseconds(e->time));
                 break;
                 // TODO: further buttons, horizontal scrolling?
             }

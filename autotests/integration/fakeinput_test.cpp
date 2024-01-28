@@ -160,7 +160,7 @@ void FakeInputTest::testPointerVerticalAxis()
     fakeInput->authenticate(QStringLiteral("org.kde.foobar"), QStringLiteral("foobar"));
     fakeInput->axis(WL_POINTER_AXIS_VERTICAL_SCROLL, wl_fixed_from_double(15));
     QVERIFY(pointerAxisSpy.wait());
-    QCOMPARE(pointerAxisSpy.last().at(0).value<InputRedirection::PointerAxis>(), InputRedirection::PointerAxisVertical);
+    QCOMPARE(pointerAxisSpy.last().at(0).value<InputDeviceAxis>(), InputDeviceAxis::Vertical);
     QCOMPARE(pointerAxisSpy.last().at(1).value<qreal>(), 15);
 }
 
@@ -178,7 +178,7 @@ void FakeInputTest::testPointerHorizontalAxis()
     fakeInput->authenticate(QStringLiteral("org.kde.foobar"), QStringLiteral("foobar"));
     fakeInput->axis(WL_POINTER_AXIS_HORIZONTAL_SCROLL, wl_fixed_from_double(15));
     QVERIFY(pointerAxisSpy.wait());
-    QCOMPARE(pointerAxisSpy.last().at(0).value<InputRedirection::PointerAxis>(), InputRedirection::PointerAxisHorizontal);
+    QCOMPARE(pointerAxisSpy.last().at(0).value<InputDeviceAxis>(), InputDeviceAxis::Horizontal);
     QCOMPARE(pointerAxisSpy.last().at(1).value<qreal>(), 15);
 }
 

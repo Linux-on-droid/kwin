@@ -255,7 +255,7 @@ static void updateAccumulators(Qt::Orientation orientation, qreal delta, qint32 
     }
 }
 
-void PointerInterface::sendAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, PointerAxisSource source, PointerAxisRelativeDirection direction)
+void PointerInterface::sendAxis(Qt::Orientation orientation, qreal delta, qint32 deltaV120, InputDeviceAxisSource source, InputDeviceAxisRelativeDirection direction)
 {
     if (!d->focusedSurface) {
         return;
@@ -281,19 +281,19 @@ void PointerInterface::sendAxis(Qt::Orientation orientation, qreal delta, qint32
             continue;
         }
 
-        if (source != PointerAxisSource::Unknown && version >= WL_POINTER_AXIS_SOURCE_SINCE_VERSION) {
+        if (source != InputDeviceAxisSource::Unknown && version >= WL_POINTER_AXIS_SOURCE_SINCE_VERSION) {
             PointerInterfacePrivate::axis_source wlSource;
             switch (source) {
-            case PointerAxisSource::Wheel:
+            case InputDeviceAxisSource::Wheel:
                 wlSource = PointerInterfacePrivate::axis_source_wheel;
                 break;
-            case PointerAxisSource::Finger:
+            case InputDeviceAxisSource::Finger:
                 wlSource = PointerInterfacePrivate::axis_source_finger;
                 break;
-            case PointerAxisSource::Continuous:
+            case InputDeviceAxisSource::Continuous:
                 wlSource = PointerInterfacePrivate::axis_source_continuous;
                 break;
-            case PointerAxisSource::WheelTilt:
+            case InputDeviceAxisSource::WheelTilt:
                 wlSource = PointerInterfacePrivate::axis_source_wheel_tilt;
                 break;
             default:
@@ -308,7 +308,7 @@ void PointerInterface::sendAxis(Qt::Orientation orientation, qreal delta, qint32
 
         if (delta) {
             if (version >= WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION) {
-                auto wlRelativeDirection = direction == PointerAxisRelativeDirection::Normal ? PointerInterfacePrivate::axis_relative_direction_identical : PointerInterfacePrivate::axis_relative_direction_inverted;
+                auto wlRelativeDirection = direction == InputDeviceAxisRelativeDirection::Normal ? PointerInterfacePrivate::axis_relative_direction_identical : PointerInterfacePrivate::axis_relative_direction_inverted;
 
                 d->send_axis_relative_direction(resource->handle, wlOrientation, wlRelativeDirection);
             }

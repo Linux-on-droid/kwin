@@ -445,12 +445,12 @@ void TestWaylandSeat::testPointer()
 
     // test axis
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 10, 120, PointerAxisSource::Wheel);
+    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 10, 120, InputDeviceAxisSource::Wheel);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(axisSpy.wait());
     QCOMPARE(frameSpy.count(), 6);
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Vertical, 20, 240, PointerAxisSource::Wheel);
+    m_seatInterface->notifyPointerAxis(Qt::Vertical, 20, 240, InputDeviceAxisSource::Wheel);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(axisSpy.wait());
     QCOMPARE(frameSpy.count(), 7);
@@ -1227,7 +1227,7 @@ void TestWaylandSeat::testPointerAxis()
 
     std::chrono::milliseconds timestamp(1);
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Vertical, 10, 120, PointerAxisSource::Wheel);
+    m_seatInterface->notifyPointerAxis(Qt::Vertical, 10, 120, InputDeviceAxisSource::Wheel);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(frameSpy.wait());
     QCOMPARE(frameSpy.count(), 2);
@@ -1244,7 +1244,7 @@ void TestWaylandSeat::testPointerAxis()
 
     // let's scroll using fingers
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 42, 0, PointerAxisSource::Finger);
+    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 42, 0, InputDeviceAxisSource::Finger);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(frameSpy.wait());
     QCOMPARE(frameSpy.count(), 3);
@@ -1259,7 +1259,7 @@ void TestWaylandSeat::testPointerAxis()
 
     // lift the fingers off the device
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 0, 0, PointerAxisSource::Finger);
+    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 0, 0, InputDeviceAxisSource::Finger);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(frameSpy.wait());
     QCOMPARE(frameSpy.count(), 4);
@@ -1273,7 +1273,7 @@ void TestWaylandSeat::testPointerAxis()
 
     // if the device is unknown, no axis_source event should be sent
     m_seatInterface->setTimestamp(timestamp++);
-    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 42, 120, PointerAxisSource::Unknown);
+    m_seatInterface->notifyPointerAxis(Qt::Horizontal, 42, 120, InputDeviceAxisSource::Unknown);
     m_seatInterface->notifyPointerFrame();
     QVERIFY(frameSpy.wait());
     QCOMPARE(frameSpy.count(), 5);

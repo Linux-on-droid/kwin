@@ -16,6 +16,40 @@ namespace KWin
 {
 
 /**
+ * Describes the source types for axis events. This indicates to the client how an axis event was
+ * physically generated; a client may adjust the user interface accordingly. For example, scroll events
+ * from a "finger" source may be in a smooth coordinate space with kinetic scrolling whereas a "wheel"
+ * source may be in discrete steps of a number of lines.
+ *
+ * The "continuous" axis source is a device generating events in a continuous coordinate space, but
+ * using something other than a finger. One example for this source is button-based scrolling where
+ * the vertical motion of a device is converted to scroll events while a button is held down.
+ *
+ * The "wheel tilt" axis source indicates that the actual device is a wheel but the scroll event is not
+ * caused by a rotation but a (usually sideways) tilt of the wheel.
+ */
+enum class InputDeviceAxisSource {
+    Unknown,
+    Wheel,
+    Finger,
+    Continuous,
+    WheelTilt,
+};
+
+enum class InputDeviceAxis {
+    Vertical,
+    Horizontal,
+};
+
+/**
+ * Maps to wl_pointer.axis_relative_direction. Currently used for y axis only
+ */
+enum class InputDeviceAxisRelativeDirection {
+    Normal,
+    Inverted
+};
+
+/**
  * The InputDevice class represents an input device, e.g. a mouse, or a keyboard, etc.
  */
 class KWIN_EXPORT InputDevice : public QObject
@@ -47,15 +81,15 @@ public:
     virtual QString outputName() const;
     virtual void setOutputName(const QString &outputName);
 
-    virtual bool isNaturalScroll() const;
-
 Q_SIGNALS:
     void keyChanged(quint32 key, InputRedirection::KeyboardKeyState, std::chrono::microseconds time, InputDevice *device);
     void pointerButtonChanged(quint32 button, InputRedirection::PointerButtonState state, std::chrono::microseconds time, InputDevice *device);
     void pointerMotionAbsolute(const QPointF &position, std::chrono::microseconds time, InputDevice *device);
     void pointerMotion(const QPointF &delta, const QPointF &deltaNonAccelerated, std::chrono::microseconds time, InputDevice *device);
-    void pointerAxisChanged(InputRedirection::PointerAxis axis, qreal delta, qint32 deltaV120,
-                            InputRedirection::PointerAxisSource source, std::chrono::microseconds time, InputDevice *device);
+    void pointerAxisChanged(InputDeviceAxis axis, qreal delta, qint32 deltaV120,
+                            InputDeviceAxisSource source,
+                            InputDeviceAxisRelativeDirection relativeDirection,
+                            std::chrono::microseconds time, InputDevice *device);
     void pointerFrame(InputDevice *device);
     void touchFrame(InputDevice *device);
     void touchCanceled(InputDevice *device);

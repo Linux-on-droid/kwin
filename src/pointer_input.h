@@ -10,6 +10,7 @@
 */
 #pragma once
 
+#include "core/inputdevice.h"
 #include "cursor.h"
 #include "input.h"
 #include "utils/xcursortheme.h"
@@ -93,7 +94,7 @@ public:
     /**
      * @internal
      */
-    void processAxis(InputRedirection::PointerAxis axis, qreal delta, qint32 deltaV120, InputRedirection::PointerAxisSource source, std::chrono::microseconds time, InputDevice *device = nullptr);
+    void processAxis(InputDeviceAxis axis, qreal delta, qint32 deltaV120, InputDeviceAxisSource source, InputDeviceAxisRelativeDirection direction, std::chrono::microseconds time, InputDevice *device = nullptr);
     /**
      * @internal
      */
