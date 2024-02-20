@@ -126,47 +126,27 @@ Edid::Edid(const void *data, uint32_t size)
         + QByteArray::number(productInfo->manufacture_week) + " " + QByteArray::number(productInfo->manufacture_year) + " " + QByteArray::number(productInfo->model_year);
 
     // colorimetry and HDR metadata
-    const auto chromaticity = di_edid_get_chromaticity_coords(edid);
-    if (chromaticity) {
+    const auto chromaticity = di_info_get_default_color_primaries(info);
+    if (chromaticity && chromaticity->default_white.x != 0) {
         m_colorimetry = Colorimetry{
-            QVector2D{chromaticity->red_x, chromaticity->red_y},
-            QVector2D{chromaticity->green_x, chromaticity->green_y},
-            QVector2D{chromaticity->blue_x, chromaticity->blue_y},
-            QVector2D{chromaticity->white_x, chromaticity->white_y},
+            QVector2D{chromaticity->primary[0].x, chromaticity->primary[0].y},
+            QVector2D{chromaticity->primary[1].x, chromaticity->primary[1].y},
+            QVector2D{chromaticity->primary[2].x, chromaticity->primary[2].y},
+            QVector2D{chromaticity->default_white.x, chromaticity->default_white.y},
         };
     } else {
         m_colorimetry.reset();
     }
 
-    const di_edid_cta *cta = nullptr;
-    const di_edid_ext *const *exts = di_edid_get_extensions(edid);
-    const di_cta_hdr_static_metadata_block *hdr_static_metadata = nullptr;
-    const di_cta_colorimetry_block *colorimetry = nullptr;
-    for (; *exts != nullptr; exts++) {
-        if ((cta = di_edid_ext_get_cta(*exts))) {
-            break;
-        }
-    }
-    if (cta) {
-        const di_cta_data_block *const *blocks = di_edid_cta_get_data_blocks(cta);
-        for (; *blocks != nullptr; blocks++) {
-            if (!hdr_static_metadata && (hdr_static_metadata = di_cta_data_block_get_hdr_static_metadata(*blocks))) {
-                continue;
-            }
-            if (!colorimetry && (colorimetry = di_cta_data_block_get_colorimetry(*blocks))) {
-                continue;
-            }
-        }
-        if (hdr_static_metadata) {
-            m_hdrMetadata = HDRMetadata{
-                .desiredContentMinLuminance = hdr_static_metadata->desired_content_min_luminance,
-                .desiredContentMaxLuminance = hdr_static_metadata->desired_content_max_luminance > 0 ? std::make_optional(hdr_static_metadata->desired_content_max_luminance) : std::nullopt,
-                .desiredMaxFrameAverageLuminance = hdr_static_metadata->desired_content_max_frame_avg_luminance > 0 ? std::make_optional(hdr_static_metadata->desired_content_max_frame_avg_luminance) : std::nullopt,
-                .supportsPQ = hdr_static_metadata->eotfs->pq,
-                .supportsBT2020 = colorimetry && colorimetry->bt2020_rgb,
-            };
-        }
-    }
+    const auto supportedColorimetry = di_info_get_supported_signal_colorimetry(info);
+    const auto hdrStaticMetadata = di_info_get_hdr_static_metadata(info);
+    m_hdrMetadata = HDRMetadata{
+        .desiredContentMinLuminance = hdrStaticMetadata->desired_content_min_luminance,
+        .desiredContentMaxLuminance = hdrStaticMetadata->desired_content_max_luminance > 0 ? std::make_optional(hdrStaticMetadata->desired_content_max_luminance) : std::nullopt,
+        .desiredMaxFrameAverageLuminance = hdrStaticMetadata->desired_content_max_frame_avg_luminance > 0 ? std::make_optional(hdrStaticMetadata->desired_content_max_frame_avg_luminance) : std::nullopt,
+        .supportsPQ = hdrStaticMetadata->pq,
+        .supportsBT2020 = supportedColorimetry->bt2020_rgb || supportedColorimetry->bt2020_ycc || supportedColorimetry->bt2020_cycc,
+    };
 
     m_isValid = true;
     di_info_destroy(info);
