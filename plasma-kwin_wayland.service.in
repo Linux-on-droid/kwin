@@ -4,8 +4,9 @@ PartOf=graphical-session.target
 
 [Service]
 Type=notify-reload
-ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/kwin_wayland_wrapper --xwayland
-BusName=org.kde.KWinWrapper
+Restart=on-failure
+FileDescriptorStoreMax=200
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/kwin_wayland --xwayland
 Slice=session.slice
 WatchdogSec=15s
 NotifyAccess=all
