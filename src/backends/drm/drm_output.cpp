@@ -343,6 +343,7 @@ bool DrmOutput::queueChanges(const std::shared_ptr<OutputChangeSet> &props)
         m_pipeline->setGammaRamp(nullptr);
         m_pipeline->setCTM(QMatrix3x3{});
     }
+    m_pipeline->setAudio(props->audio.value_or(m_state.audio));
     return true;
 }
 
@@ -396,6 +397,7 @@ void DrmOutput::applyQueuedChanges(const std::shared_ptr<OutputChangeSet> &props
     next.iccProfile = props->iccProfile.value_or(m_state.iccProfile);
     next.colorDescription = m_pipeline->colorDescription();
     next.vrrPolicy = props->vrrPolicy.value_or(m_state.vrrPolicy);
+    next.audio = props->audio.value_or(m_state.audio);
     setState(next);
 
     if (!isEnabled() && m_pipeline->needsModeset()) {

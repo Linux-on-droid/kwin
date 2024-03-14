@@ -622,6 +622,9 @@ void Output::setState(const State &state)
     if (oldState.colorDescription != state.colorDescription) {
         Q_EMIT colorDescriptionChanged();
     }
+    if (oldState.audio != state.audio) {
+        Q_EMIT audioChanged();
+    }
     if (oldState.enabled != state.enabled) {
         Q_EMIT enabledChanged();
     }
@@ -767,6 +770,11 @@ std::optional<double> Output::minBrightnessOverride() const
 double Output::sdrGamutWideness() const
 {
     return m_state.sdrGamutWideness;
+}
+
+Output::Audio Output::audio() const
+{
+    return m_state.audio;
 }
 } // namespace KWin
 

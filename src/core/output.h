@@ -184,6 +184,14 @@ public:
     };
     Q_ENUM(AutoRotationPolicy);
 
+    enum class Audio {
+        ForceDVI,
+        Off,
+        Auto,
+        On,
+    };
+    Q_ENUM(Audio);
+
     explicit Output(QObject *parent = nullptr);
     ~Output() override;
 
@@ -359,6 +367,8 @@ public:
 
     const ColorDescription &colorDescription() const;
 
+    Audio audio() const;
+
 Q_SIGNALS:
     /**
      * This signal is emitted when the geometry of this output has changed.
@@ -421,6 +431,7 @@ Q_SIGNALS:
     void brightnessMetadataChanged();
     void sdrGamutWidenessChanged();
     void colorDescriptionChanged();
+    void audioChanged();
 
 protected:
     struct Information
@@ -469,6 +480,7 @@ protected:
         std::optional<double> minBrightnessOverride;
         double sdrGamutWideness = 0;
         VrrPolicy vrrPolicy = VrrPolicy::Automatic;
+        Audio audio = Audio::Auto;
     };
 
     void setInformation(const Information &information);

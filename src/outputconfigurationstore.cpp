@@ -234,6 +234,7 @@ void OutputConfigurationStore::storeConfig(const QList<Output *> &allOutputs, bo
                 .maxAverageBrightnessOverride = changeSet->maxAverageBrightnessOverride.value_or(output->maxAverageBrightnessOverride()),
                 .minBrightnessOverride = changeSet->minBrightnessOverride.value_or(output->minBrightnessOverride()),
                 .sdrGamutWideness = changeSet->sdrGamutWideness.value_or(output->sdrGamutWideness()),
+                .audio = changeSet->audio.value_or(output->audio()),
             };
             *outputIt = SetupState{
                 .outputIndex = *outputIndex,
@@ -267,6 +268,7 @@ void OutputConfigurationStore::storeConfig(const QList<Output *> &allOutputs, bo
                 .maxAverageBrightnessOverride = output->maxAverageBrightnessOverride(),
                 .minBrightnessOverride = output->minBrightnessOverride(),
                 .sdrGamutWideness = output->sdrGamutWideness(),
+                .audio = output->audio(),
             };
             *outputIt = SetupState{
                 .outputIndex = *outputIndex,
@@ -314,6 +316,7 @@ std::pair<OutputConfiguration, QList<Output *>> OutputConfigurationStore::setupT
             .maxAverageBrightnessOverride = state.maxAverageBrightnessOverride,
             .minBrightnessOverride = state.minBrightnessOverride,
             .sdrGamutWideness = state.sdrGamutWideness,
+            .audio = state.audio,
         };
         if (setupState.enabled) {
             priorities.push_back(std::make_pair(output, setupState.priority));
@@ -428,6 +431,7 @@ std::pair<OutputConfiguration, QList<Output *>> OutputConfigurationStore::genera
             .sdrBrightness = existingData.sdrBrightness.value_or(200),
             .wideColorGamut = existingData.wideColorGamut.value_or(false),
             .autoRotationPolicy = existingData.autoRotation.value_or(Output::AutoRotationPolicy::InTabletMode),
+            .audio = existingData.audio.value_or(Output::Audio::Auto),
         };
         if (enable) {
             const auto modeSize = changeset->transform->map(mode->size());
@@ -707,6 +711,18 @@ void OutputConfigurationStore::load()
         if (const auto it = data.find("sdrGamutWideness"); it != data.end() && it->isDouble()) {
             state.sdrGamutWideness = it->toDouble();
         }
+        if (const auto it = data.find("audio"); it != data.end()) {
+            const auto str = it->toString();
+            if (str == "ForceDVI") {
+                state.audio = Output::Audio::ForceDVI;
+            } else if (str == "Off") {
+                state.audio = Output::Audio::Off;
+            } else if (str == "Auto") {
+                state.audio = Output::Audio::Auto;
+            } else if (str == "On") {
+                state.audio = Output::Audio::On;
+            }
+        }
         outputDatas.push_back(state);
     }
 
@@ -922,6 +938,22 @@ void OutputConfigurationStore::save()
         }
         if (output.sdrGamutWideness) {
             o["sdrGamutWideness"] = *output.sdrGamutWideness;
+        }
+        if (output.audio) {
+            switch (*output.audio) {
+            case Output::Audio::ForceDVI:
+                o["audio"] = "ForceDVI";
+                break;
+            case Output::Audio::Off:
+                o["audio"] = "Off";
+                break;
+            case Output::Audio::Auto:
+                o["audio"] = "Auto";
+                break;
+            case Output::Audio::On:
+                o["audio"] = "On";
+                break;
+            }
         }
         outputsData.append(o);
     }

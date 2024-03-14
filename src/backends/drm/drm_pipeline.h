@@ -133,6 +133,7 @@ public:
     void setContentType(DrmConnector::DrmContentType type);
     void setColorDescription(const ColorDescription &description);
     void setIccProfile(const std::shared_ptr<IccProfile> &profile);
+    void setAudio(Output::Audio audio);
 
     /**
      * amdgpu drops cursor updates with adaptive sync: https://gitlab.freedesktop.org/drm/amd/-/issues/2186
@@ -195,6 +196,7 @@ private:
 
         std::shared_ptr<IccProfile> iccProfile;
         ColorDescription colorDescription = ColorDescription::sRGB;
+        Output::Audio audio = Output::Audio::Auto;
 
         // the transformation that buffers submitted to the pipeline should have
         DrmPlane::Transformations renderOrientation = DrmPlane::Transformation::Rotate0;
