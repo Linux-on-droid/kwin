@@ -3348,7 +3348,14 @@ Output *Window::moveResizeOutput() const
 
 void Window::setMoveResizeOutput(Output *output)
 {
+    if (m_moveResizeOutput != output) {
+        if (m_moveResizeOutput) {
+            disconnect(m_moveResizeOutput, &Output::scaleChanged, this, &Window::updateTargetScale);
+        }
+        connect(output, &Output::scaleChanged, this, &Window::updateTargetScale);
+    }
     m_moveResizeOutput = output;
+    updateTargetScale();
 }
 
 void Window::move(const QPointF &point)
@@ -4311,6 +4318,20 @@ void Window::maybeSendFrameCallback()
         });
         // update refresh rate, it might have changed
         m_offscreenFramecallbackTimer.start(1'000'000 / output()->refreshRate());
+    }
+}
+
+double Window::targetScale() const
+{
+    return m_targetScale;
+}
+
+void Window::updateTargetScale()
+{
+    const double newScale = m_moveResizeOutput->scale();
+    if (newScale != m_targetScale) {
+        m_targetScale = newScale;
+        Q_EMIT targetScaleChanged();
     }
 }
 
