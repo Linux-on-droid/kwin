@@ -1727,6 +1727,8 @@ protected:
     void cleanTabBox();
     void maybeSendFrameCallback();
     void updateTargetScale();
+    double snapToPixels(double value) const;
+    QSizeF snapToPixels(QSizeF value) const;
 
     Output *m_output = nullptr;
     QRectF m_frameGeometry;

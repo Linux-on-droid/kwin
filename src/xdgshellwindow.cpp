@@ -208,6 +208,8 @@ void XdgSurfaceWindow::handleNextWindowGeometry()
 
     if (m_windowGeometry.isEmpty()) {
         qCWarning(KWIN_CORE) << "Committed empty window geometry, dealing with a buggy client!";
+    } else {
+        m_windowGeometry = QRectF(snapToPixels(m_windowGeometry.x()), snapToPixels(m_windowGeometry.y()), snapToPixels(m_windowGeometry.width()), snapToPixels(m_windowGeometry.height()));
     }
 
     QRectF frameGeometry(pos(), clientSizeToFrameSize(m_windowGeometry.size()));
@@ -280,7 +282,7 @@ QRectF XdgSurfaceWindow::frameRectToBufferRect(const QRectF &rect) const
 {
     const qreal left = rect.left() + borderLeft() - m_windowGeometry.left();
     const qreal top = rect.top() + borderTop() - m_windowGeometry.top();
-    return QRectF(QPoint(left, top), surface()->size());
+    return QRectF(QPointF(left, top), snapToPixels(surface()->size()));
 }
 
 void XdgSurfaceWindow::handleRoleDestroyed()
@@ -679,7 +681,7 @@ void XdgToplevelWindow::closeWindow()
 
 XdgSurfaceConfigure *XdgToplevelWindow::sendRoleConfigure() const
 {
-    QSize framePadding(0, 0);
+    QSizeF framePadding(0, 0);
     if (m_nextDecoration) {
         framePadding.setWidth(m_nextDecoration->borderLeft() + m_nextDecoration->borderRight());
         framePadding.setHeight(m_nextDecoration->borderTop() + m_nextDecoration->borderBottom());

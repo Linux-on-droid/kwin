@@ -3337,8 +3337,11 @@ QRectF Window::moveResizeGeometry() const
 
 void Window::setMoveResizeGeometry(const QRectF &geo)
 {
-    m_moveResizeGeometry = geo;
-    m_moveResizeOutput = workspace()->outputAt(geo.center());
+    QRectF newGeom = geo;
+    newGeom.setWidth(snapToPixels(newGeom.width() - borderLeft() - borderRight()) + borderLeft() + borderRight());
+    newGeom.setHeight(snapToPixels(newGeom.height() - borderTop() - borderBottom()) + borderTop() + borderBottom());
+    m_moveResizeGeometry = newGeom;
+    setMoveResizeOutput(workspace()->outputAt(newGeom.center()));
 }
 
 Output *Window::moveResizeOutput() const
@@ -3363,7 +3366,7 @@ void Window::move(const QPointF &point)
     const QRectF rect = QRectF(point, m_moveResizeGeometry.size());
 
     setMoveResizeGeometry(rect);
-    moveResizeInternal(rect, MoveResizeMode::Move);
+    moveResizeInternal(m_moveResizeGeometry, MoveResizeMode::Move);
 }
 
 void Window::resize(const QSizeF &size)
@@ -3371,13 +3374,13 @@ void Window::resize(const QSizeF &size)
     const QRectF rect = QRectF(m_moveResizeGeometry.topLeft(), size);
 
     setMoveResizeGeometry(rect);
-    moveResizeInternal(rect, MoveResizeMode::Resize);
+    moveResizeInternal(m_moveResizeGeometry, MoveResizeMode::Resize);
 }
 
 void Window::moveResize(const QRectF &rect)
 {
     setMoveResizeGeometry(rect);
-    moveResizeInternal(rect, MoveResizeMode::MoveResize);
+    moveResizeInternal(m_moveResizeGeometry, MoveResizeMode::MoveResize);
 }
 
 void Window::setElectricBorderMode(QuickTileMode mode)
@@ -4331,8 +4334,30 @@ void Window::updateTargetScale()
     const double newScale = m_moveResizeOutput->scale();
     if (newScale != m_targetScale) {
         m_targetScale = newScale;
+
+        // decoration etc recalculates border sizes when this is emitted
         Q_EMIT targetScaleChanged();
+
+        // snap the size to the new coordinate grid, taking the new border size into account
+        // TODO when this doesn't cause an actual resize, the client and buffer sizes won't be snapped
+        // to the coordinate grid. Maybe XdgToplevelWindow and X11Window need to do this instead
+
+        // Also, X11Window's geometry needs to be snapped to the X11 coordinate size, not to the actual pixel grid
+        // -> handle this in the window subclasses?
+        //  -> WaylandWindow sets the target scale to the scale of the output
+        //  -> X11Window sets the target scale to the Xwayland scale. That path can then also take care of "handleXwaylandScaleChanged"
+        moveResize(clientRectToFrameRect(clientGeometry()));
     }
+}
+
+double Window::snapToPixels(double value) const
+{
+    return std::round(value * m_targetScale) / m_targetScale;
+}
+
+QSizeF Window::snapToPixels(QSizeF value) const
+{
+    return QSizeF(snapToPixels(value.width()), snapToPixels(value.height()));
 }
 
 bool Window::isShown() const

@@ -226,7 +226,7 @@ void WaylandWindow::cleanGrouping()
 
 QRectF WaylandWindow::frameRectToBufferRect(const QRectF &rect) const
 {
-    return QRectF(rect.topLeft(), surface()->size());
+    return QRectF(rect.topLeft(), snapToPixels(surface()->size()));
 }
 
 void WaylandWindow::updateGeometry(const QRectF &rect)
