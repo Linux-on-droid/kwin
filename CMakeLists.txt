@@ -102,6 +102,7 @@ if(KWIN_BUILD_KCMS)
         NewStuff
         Service
         XmlGui
+        Runner
     )
 endif()
 

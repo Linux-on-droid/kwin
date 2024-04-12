@@ -20,7 +20,6 @@ using namespace std::chrono_literals;
 
 namespace KWin
 {
-
 OverviewEffect::OverviewEffect()
     // manages the transition between inactive -> overview
     : m_overviewState(new EffectTogglableState(this))
@@ -31,6 +30,7 @@ OverviewEffect::OverviewEffect()
     , m_border(new EffectTogglableTouchBorder(m_overviewState))
     , m_gridBorder(new EffectTogglableTouchBorder(m_gridState))
     , m_shutdownTimer(new QTimer(this))
+    , m_manager(new KRunner::RunnerManager())
 {
     auto gesture = new EffectTogglableGesture(m_overviewState);
     gesture->addTouchpadSwipeGesture(SwipeDirection::Up, 4);
@@ -50,7 +50,7 @@ OverviewEffect::OverviewEffect()
 
     connect(m_overviewState, &EffectTogglableState::statusChanged, this, [this](EffectTogglableState::Status status) {
         if (status == EffectTogglableState::Status::Activating || status == EffectTogglableState::Status::Active) {
-            m_searchText = QString();
+            setSearchText(QString());
             setRunning(true);
             m_gridState->stop();
         }
@@ -83,7 +83,7 @@ OverviewEffect::OverviewEffect()
 
     connect(m_gridState, &EffectTogglableState::statusChanged, this, [this](EffectTogglableState::Status status) {
         if (status == EffectTogglableState::Status::Activating || status == EffectTogglableState::Status::Active) {
-            m_searchText = QString();
+            setSearchText(QString());
             setRunning(true);
             m_overviewState->stop();
         }
@@ -385,6 +385,14 @@ void OverviewEffect::swapDesktops(VirtualDesktop *from, VirtualDesktop *to)
     }
     for (auto *w : toList) {
         effects->windowToDesktops(w, {from});
+    }
+}
+
+void OverviewEffect::setSearchText(const QString &text)
+{
+    if (text != m_searchText) {
+        m_searchText = text;
+        Q_EMIT searchTextChanged();
     }
 }
 

@@ -750,6 +750,9 @@ FocusScope {
                 onActivated: {
                     effect.deactivate();
                 }
+                Component.onCompleted: {
+                    milouView.model.runnerManager = effect.manager
+                }
             }
 
             Keys.forwardTo: milouView
