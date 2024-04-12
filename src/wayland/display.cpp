@@ -242,6 +242,11 @@ GraphicsBuffer *Display::bufferForResource(wl_resource *resource)
     }
 }
 
+void Display::setDefaultMaxBufferSize(size_t max)
+{
+    wl_display_set_default_max_buffer_size(d->display, max);
+}
+
 SecurityContext::SecurityContext(Display *display, FileDescriptor &&listenFd, FileDescriptor &&closeFd, const QString &appId)
     : QObject(display)
     , m_display(display)

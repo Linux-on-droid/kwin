@@ -187,10 +187,16 @@ public:
     }
 };
 
+static size_t mibToBytes(size_t mib)
+{
+    return mib * (size_t(1) << 20);
+}
+
 WaylandServer::WaylandServer(QObject *parent)
     : QObject(parent)
     , m_display(new KWinDisplay(this))
 {
+    m_display->setDefaultMaxBufferSize(mibToBytes(1));
 }
 
 WaylandServer::~WaylandServer()
