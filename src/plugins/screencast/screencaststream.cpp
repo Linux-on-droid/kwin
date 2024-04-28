@@ -87,7 +87,7 @@ void ScreenCastStream::onStreamStateChanged(pw_stream_state old, pw_stream_state
         m_source->pause();
         break;
     case PW_STREAM_STATE_STREAMING:
-        m_lastSent.reset();
+        m_lastProcessTimestamp.reset();
         m_source->resume();
         break;
     case PW_STREAM_STATE_CONNECTING:
@@ -245,6 +245,20 @@ void ScreenCastStream::onStreamRemoveBuffer(pw_buffer *pwBuffer)
     }
 }
 
+void ScreenCastStream::onStreamProcess()
+{
+    if (m_closed) {
+        return;
+    }
+
+    record(m_pendingDamage, m_pendingContents);
+    m_pendingDamage = {};
+    m_pendingContents = {};
+
+    resize(m_source->textureSize());
+    m_lastProcessTimestamp = std::chrono::steady_clock::now();
+}
+
 ScreenCastStream::ScreenCastStream(ScreenCastSource *source, std::shared_ptr<PipeWireCore> pwCore, QObject *parent)
     : QObject(parent)
     , m_pwCore(pwCore)
@@ -252,7 +266,7 @@ ScreenCastStream::ScreenCastStream(ScreenCastSource *source, std::shared_ptr<Pip
     , m_resolution(source->textureSize())
 {
     connect(source, &ScreenCastSource::frame, this, [this](const QRegion &damage) {
-        recordFrame(damage, Content::Video);
+        scheduleRecord(damage, Content::Video);
     });
     connect(source, &ScreenCastSource::closed, this, &ScreenCastStream::close);
 
@@ -273,11 +287,13 @@ ScreenCastStream::ScreenCastStream(ScreenCastSource *source, std::shared_ptr<Pip
         auto _this = static_cast<ScreenCastStream *>(data);
         _this->onStreamParamChanged(id, param);
     };
+    m_pwStreamEvents.process = [](void *data) {
+        auto _this = static_cast<ScreenCastStream *>(data);
+        _this->onStreamProcess();
+    };
 
-    m_pendingFrame.setSingleShot(true);
-    connect(&m_pendingFrame, &QTimer::timeout, this, [this] {
-        recordFrame(m_pendingDamage, m_pendingContents);
-    });
+    m_processThrottleTimer.setSingleShot(true);
+    connect(&m_processThrottleTimer, &QTimer::timeout, this, &ScreenCastStream::triggerProcess);
 }
 
 ScreenCastStream::~ScreenCastStream()
@@ -368,7 +384,7 @@ bool ScreenCastStream::createStream()
     case ScreencastV1Interface::Metadata:
         m_cursor.changedConnection = connect(Cursors::self(), &Cursors::currentCursorChanged, this, &ScreenCastStream::invalidateCursor);
         m_cursor.positionChangedConnection = connect(Cursors::self(), &Cursors::positionChanged, this, [this] {
-            recordFrame({}, Content::Cursor);
+            scheduleRecord({}, Content::Cursor);
         });
         break;
     }
@@ -389,7 +405,7 @@ void ScreenCastStream::close()
     }
 
     m_closed = true;
-    m_pendingFrame.stop();
+    m_processThrottleTimer.stop();
 
     disconnect(m_cursor.changedConnection);
     m_cursor.changedConnection = {};
@@ -401,7 +417,7 @@ void ScreenCastStream::close()
     Q_EMIT closed();
 }
 
-void ScreenCastStream::recordFrame(const QRegion &damage, Contents contents)
+void ScreenCastStream::scheduleRecord(const QRegion &damage, Contents contents)
 {
     Q_ASSERT(!m_closed);
 
@@ -420,23 +436,31 @@ void ScreenCastStream::recordFrame(const QRegion &damage, Contents contents)
         }
     }
 
-    if (m_videoFormat.max_framerate.num != 0 && m_lastSent.has_value()) {
+    m_pendingDamage += damage;
+    m_pendingContents |= contents;
+
+    triggerProcess();
+}
+
+void ScreenCastStream::triggerProcess()
+{
+    if (m_videoFormat.max_framerate.num != 0 && m_lastProcessTimestamp.has_value()) {
         const auto now = std::chrono::steady_clock::now();
         const auto frameInterval = std::chrono::milliseconds(1000 * m_videoFormat.max_framerate.denom / m_videoFormat.max_framerate.num);
-        const auto lastSentAgo = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastSent.value());
+        const auto lastSentAgo = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastProcessTimestamp.value());
         if (lastSentAgo < frameInterval) {
-            m_pendingDamage += damage;
-            m_pendingContents |= contents;
-            if (!m_pendingFrame.isActive()) {
-                m_pendingFrame.start(frameInterval - lastSentAgo);
+            if (!m_processThrottleTimer.isActive()) {
+                m_processThrottleTimer.start(frameInterval - lastSentAgo);
             }
             return;
         }
     }
 
-    m_pendingDamage = {};
-    m_pendingContents = {};
+    pw_stream_trigger_process(m_pwStream);
+}
 
+void ScreenCastStream::record(const QRegion &damage, Contents contents)
+{
     struct pw_buffer *pwBuffer = pw_stream_dequeue_buffer(m_pwStream);
     if (!pwBuffer) {
         return;
@@ -505,9 +529,6 @@ void ScreenCastStream::recordFrame(const QRegion &damage, Contents contents)
     }
 
     pw_stream_queue_buffer(m_pwStream, pwBuffer);
-    m_lastSent = std::chrono::steady_clock::now();
-
-    resize(m_source->textureSize());
 }
 
 void ScreenCastStream::resize(const QSize &resolution)
