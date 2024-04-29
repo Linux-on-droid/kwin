@@ -173,6 +173,9 @@ DrmPipeline::Error DrmPipeline::commitPipelinesAtomic(const QList<DrmPipeline *>
         }
         for (const auto pipeline : pipelines) {
             pipeline->m_next.needsModeset = pipeline->m_pending.needsModeset = false;
+            auto throwaway = std::make_unique<DrmAtomicCommit>(QList<DrmPipeline *>{pipeline});
+            pipeline->prepareAtomicCommit(throwaway.get(), CommitMode::CommitModeset, frame);
+            pipeline->m_commitThread->mergeStateCommit(std::move(throwaway));
         }
         commit->pageFlipped(std::chrono::steady_clock::now().time_since_epoch());
         return Error::None;

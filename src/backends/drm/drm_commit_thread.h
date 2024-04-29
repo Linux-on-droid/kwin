@@ -43,6 +43,8 @@ public:
      *         in order to get presented at that timestamp
      */
     std::chrono::nanoseconds safetyMargin() const;
+
+    void mergeStateCommit(std::unique_ptr<DrmAtomicCommit> &&commit);
     DrmAtomicCommit *currentStateCommit() const;
 
 private:

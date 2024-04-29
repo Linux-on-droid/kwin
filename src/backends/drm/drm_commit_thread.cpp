@@ -300,12 +300,8 @@ void DrmCommitThread::pageFlipped(std::chrono::nanoseconds timestamp)
     std::unique_lock lock(m_mutex);
     m_lastPageflip = TimePoint(timestamp);
     if (auto atomic = dynamic_cast<DrmAtomicCommit *>(m_committed.get())) {
-        if (m_currentState) {
-            m_currentState->merge(atomic);
-        } else {
-            m_currentState.reset(atomic);
-            m_committed.release();
-        }
+        mergeStateCommit(std::unique_ptr<DrmAtomicCommit>(atomic));
+        m_committed.release();
     } else {
         m_committed.reset();
         m_currentState.reset();
@@ -338,6 +334,15 @@ TimePoint DrmCommitThread::estimateNextVblank(TimePoint now) const
 std::chrono::nanoseconds DrmCommitThread::safetyMargin() const
 {
     return m_safetyMargin;
+}
+
+void DrmCommitThread::mergeStateCommit(std::unique_ptr<DrmAtomicCommit> &&commit)
+{
+    if (m_currentState) {
+        m_currentState->merge(commit.get());
+    } else {
+        m_currentState = std::move(commit);
+    }
 }
 
 DrmAtomicCommit *DrmCommitThread::currentStateCommit() const
