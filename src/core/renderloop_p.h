@@ -11,6 +11,7 @@
 
 #include <QTimer>
 
+#include <fstream>
 #include <optional>
 
 namespace KWin
@@ -32,11 +33,12 @@ public:
     void scheduleRepaint(std::chrono::nanoseconds lastTargetTimestamp);
 
     void notifyFrameDropped();
-    void notifyFrameCompleted(std::chrono::nanoseconds timestamp, std::optional<std::chrono::nanoseconds> renderTime, PresentationMode mode = PresentationMode::VSync);
+    void notifyFrameCompleted(std::chrono::nanoseconds timestamp, std::optional<std::chrono::nanoseconds> renderTime, PresentationMode mode, std::chrono::nanoseconds renderPrediction);
     void notifyVblank(std::chrono::nanoseconds timestamp);
 
     RenderLoop *const q;
     Output *const output;
+    std::optional<std::fstream> m_debugOutput;
     std::chrono::nanoseconds lastPresentationTimestamp = std::chrono::nanoseconds::zero();
     std::chrono::nanoseconds nextPresentationTimestamp = std::chrono::nanoseconds::zero();
     QTimer compositeTimer;

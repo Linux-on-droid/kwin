@@ -47,6 +47,7 @@ std::optional<RenderTimeSpan> CpuRenderTimeQuery::query()
 OutputFrame::OutputFrame(RenderLoop *loop, std::chrono::nanoseconds refreshDuration)
     : m_loop(loop)
     , m_refreshDuration(refreshDuration)
+    , m_predictedRenderTime(loop->renderTimePrediction())
 {
 }
 
@@ -86,7 +87,7 @@ std::optional<std::chrono::nanoseconds> OutputFrame::queryRenderTime() const
 void OutputFrame::presented(std::chrono::nanoseconds timestamp, PresentationMode mode)
 {
     std::optional<std::chrono::nanoseconds> renderTime = queryRenderTime();
-    RenderLoopPrivate::get(m_loop)->notifyFrameCompleted(timestamp, renderTime, mode);
+    RenderLoopPrivate::get(m_loop)->notifyFrameCompleted(timestamp, renderTime, mode, m_predictedRenderTime);
     m_presented = true;
     for (const auto &feedback : m_feedbacks) {
         feedback->presented(m_refreshDuration, timestamp, mode);

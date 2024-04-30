@@ -94,6 +94,8 @@ public:
 
     void setMaxPendingFrameCount(uint32_t maxCount);
 
+    std::chrono::nanoseconds renderTimePrediction() const;
+
 Q_SIGNALS:
     /**
      * This signal is emitted when the refresh rate of this RenderLoop has changed.

@@ -12,6 +12,8 @@
 #include "window.h"
 #include "workspace.h"
 
+#include <filesystem>
+
 using namespace std::chrono_literals;
 
 namespace KWin
@@ -94,8 +96,15 @@ void RenderLoopPrivate::notifyFrameDropped()
     }
 }
 
-void RenderLoopPrivate::notifyFrameCompleted(std::chrono::nanoseconds timestamp, std::optional<std::chrono::nanoseconds> renderTime, PresentationMode mode)
+void RenderLoopPrivate::notifyFrameCompleted(std::chrono::nanoseconds timestamp, std::optional<std::chrono::nanoseconds> renderTime, PresentationMode mode, std::chrono::nanoseconds renderPrediction)
 {
+    if (!m_debugOutput) {
+        m_debugOutput = std::fstream(qPrintable(output->name() + " render times.csv"), std::ios::out);
+        *m_debugOutput << "pageflip timestamp,render time\n";
+        qWarning() << "printing render times to:" << output->name() + " render times.csv";
+    }
+    *m_debugOutput << timestamp.count() << "," << renderTime.value_or(std::chrono::nanoseconds::zero()).count() << "," << renderPrediction.count() << "\n";
+
     Q_ASSERT(pendingFrameCount > 0);
     pendingFrameCount--;
 
@@ -242,6 +251,11 @@ void RenderLoop::setPresentationMode(PresentationMode mode)
 void RenderLoop::setMaxPendingFrameCount(uint32_t maxCount)
 {
     d->maxPendingFrameCount = maxCount;
+}
+
+std::chrono::nanoseconds RenderLoop::renderTimePrediction() const
+{
+    return d->renderJournal.result();
 }
 
 } // namespace KWin
