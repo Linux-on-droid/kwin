@@ -35,73 +35,13 @@
 namespace KWin
 {
 
-static const bool s_allowColorspaceIntel = qEnvironmentVariableIntValue("KWIN_DRM_ALLOW_INTEL_COLORSPACE") == 1;
-
 DrmOutput::DrmOutput(const std::shared_ptr<DrmConnector> &conn)
     : DrmAbstractOutput(conn->gpu())
     , m_pipeline(conn->pipeline())
     , m_connector(conn)
 {
     m_pipeline->setOutput(this);
-    m_renderLoop->setRefreshRate(m_pipeline->mode()->refreshRate());
-
-    Capabilities capabilities = Capability::Dpms | Capability::IccProfile;
-    State initialState;
-
-    if (conn->overscan.isValid() || conn->underscan.isValid()) {
-        capabilities |= Capability::Overscan;
-        initialState.overscan = conn->overscan.isValid() ? conn->overscan.value() : conn->underscanVBorder.value();
-    }
-    if (conn->vrrCapable.isValid() && conn->vrrCapable.value()) {
-        capabilities |= Capability::Vrr;
-    }
-    if (gpu()->asyncPageflipSupported()) {
-        capabilities |= Capability::Tearing;
-    }
-    if (conn->broadcastRGB.isValid()) {
-        capabilities |= Capability::RgbRange;
-        initialState.rgbRange = DrmConnector::broadcastRgbToRgbRange(conn->broadcastRGB.enumValue());
-    }
-    if (m_connector->hdrMetadata.isValid() && m_connector->edid()->supportsPQ()) {
-        capabilities |= Capability::HighDynamicRange;
-    }
-    if (m_connector->colorspace.isValid() && m_connector->colorspace.hasEnum(DrmConnector::Colorspace::BT2020_RGB) && m_connector->edid()->supportsBT2020()) {
-        if (!m_gpu->isI915() || s_allowColorspaceIntel) {
-            capabilities |= Capability::WideColorGamut;
-        }
-    }
-    if (conn->isInternal()) {
-        // TODO only set this if an orientation sensor is available?
-        capabilities |= Capability::AutoRotation;
-    }
-
-    const Edid *edid = conn->edid();
-    setInformation(Information{
-        .name = conn->connectorName(),
-        .manufacturer = edid->manufacturerString(),
-        .model = conn->modelName(),
-        .serialNumber = edid->serialNumber(),
-        .eisaId = edid->eisaId(),
-        .physicalSize = conn->physicalSize(),
-        .edid = *edid,
-        .subPixel = conn->subpixel(),
-        .capabilities = capabilities,
-        .panelOrientation = conn->panelOrientation.isValid() ? DrmConnector::toKWinTransform(conn->panelOrientation.enumValue()) : OutputTransform::Normal,
-        .internal = conn->isInternal(),
-        .nonDesktop = conn->isNonDesktop(),
-        .mstPath = conn->mstPath(),
-        .maxPeakBrightness = edid->desiredMaxLuminance(),
-        .maxAverageBrightness = edid->desiredMaxFrameAverageLuminance(),
-        .minBrightness = edid->desiredMinLuminance(),
-    });
-
-    initialState.modes = getModes();
-    initialState.currentMode = m_pipeline->mode();
-    if (!initialState.currentMode) {
-        initialState.currentMode = initialState.modes.constFirst();
-    }
-
-    setState(initialState);
+    updateConnectorProperties();
 
     m_turnOffTimer.setSingleShot(true);
     m_turnOffTimer.setInterval(dimAnimationTime());
@@ -240,8 +180,10 @@ DrmPlane::Transformations outputToPlaneTransform(OutputTransform transform)
     }
 }
 
-void DrmOutput::updateModes()
+void DrmOutput::updateConnectorProperties()
 {
+    updateInformation();
+
     State next = m_state;
     next.modes = getModes();
 
@@ -262,10 +204,65 @@ void DrmOutput::updateModes()
 
     next.currentMode = m_pipeline->mode();
     if (!next.currentMode) {
+        // some mode needs to be set
         next.currentMode = next.modes.constFirst();
+        m_renderLoop->setRefreshRate(next.currentMode->refreshRate());
+        m_pipeline->setMode(std::static_pointer_cast<DrmConnectorMode>(next.currentMode));
+        m_pipeline->applyPendingChanges();
     }
 
     setState(next);
+}
+
+static const bool s_allowColorspaceIntel = qEnvironmentVariableIntValue("KWIN_DRM_ALLOW_INTEL_COLORSPACE") == 1;
+
+void DrmOutput::updateInformation()
+{
+    Capabilities capabilities = Capability::Dpms | Capability::IccProfile;
+    if (m_connector->overscan.isValid() || m_connector->underscan.isValid()) {
+        capabilities |= Capability::Overscan;
+    }
+    if (m_connector->vrrCapable.isValid() && m_connector->vrrCapable.value()) {
+        capabilities |= Capability::Vrr;
+    }
+    if (gpu()->asyncPageflipSupported()) {
+        capabilities |= Capability::Tearing;
+    }
+    if (m_connector->broadcastRGB.isValid()) {
+        capabilities |= Capability::RgbRange;
+    }
+    if (m_connector->hdrMetadata.isValid() && m_connector->edid()->supportsPQ()) {
+        capabilities |= Capability::HighDynamicRange;
+    }
+    if (m_connector->colorspace.isValid() && m_connector->colorspace.hasEnum(DrmConnector::Colorspace::BT2020_RGB) && m_connector->edid()->supportsBT2020()) {
+        if (!m_gpu->isI915() || s_allowColorspaceIntel) {
+            capabilities |= Capability::WideColorGamut;
+        }
+    }
+    if (m_connector->isInternal()) {
+        // TODO only set this if an orientation sensor is available?
+        capabilities |= Capability::AutoRotation;
+    }
+
+    const Edid *edid = m_connector->edid();
+    setInformation(Information{
+        .name = m_connector->connectorName(),
+        .manufacturer = edid->manufacturerString(),
+        .model = m_connector->modelName(),
+        .serialNumber = edid->serialNumber(),
+        .eisaId = edid->eisaId(),
+        .physicalSize = m_connector->physicalSize(),
+        .edid = *edid,
+        .subPixel = m_connector->subpixel(),
+        .capabilities = capabilities,
+        .panelOrientation = m_connector->panelOrientation.isValid() ? DrmConnector::toKWinTransform(m_connector->panelOrientation.enumValue()) : OutputTransform::Normal,
+        .internal = m_connector->isInternal(),
+        .nonDesktop = m_connector->isNonDesktop(),
+        .mstPath = m_connector->mstPath(),
+        .maxPeakBrightness = edid->desiredMaxLuminance(),
+        .maxAverageBrightness = edid->desiredMaxFrameAverageLuminance(),
+        .minBrightness = edid->desiredMinLuminance(),
+    });
 }
 
 void DrmOutput::updateDpmsMode(DpmsMode dpmsMode)

@@ -293,6 +293,8 @@ bool DrmGpu::updateOutputs()
             pipeline->setLayers(m_platform->renderBackend()->createDrmPlaneLayer(pipeline, DrmPlane::TypeIndex::Primary), m_platform->renderBackend()->createDrmPlaneLayer(pipeline, DrmPlane::TypeIndex::Cursor));
             pipeline->setActive(!conn->isNonDesktop());
             pipeline->applyPendingChanges();
+        } else {
+            output->updateConnectorProperties();
         }
         if (stillExists) {
             it++;
