@@ -70,6 +70,7 @@ private Q_SLOTS:
     void testConnectorLifetime();
     void testModeset_data();
     void testModeset();
+    void testVrrChange();
 };
 
 static void verifyCleanup(MockGpu *mockGpu)
@@ -390,6 +391,30 @@ void DrmTest::testModeset()
 
     gpu.reset();
     verifyCleanup(mockGpu.get());
+}
+
+void DrmTest::testVrrChange()
+{
+    const auto mockGpu = findPrimaryDevice(5);
+    mockGpu->deviceCaps[MOCKDRM_DEVICE_CAP_ATOMIC] = 1;
+
+    const auto conn = std::make_shared<MockConnector>(mockGpu.get());
+    conn->setVrrCapable(false);
+    mockGpu->connectors.push_back(conn);
+
+    const auto session = Session::create(Session::Type::Noop);
+    const auto backend = std::make_unique<DrmBackend>(session.get());
+    const auto renderBackend = backend->createQPainterBackend();
+    auto gpu = std::make_unique<DrmGpu>(backend.get(), mockGpu->fd, DrmDevice::open(mockGpu->devNode));
+
+    QVERIFY(gpu->updateOutputs());
+    const auto output = gpu->drmOutputs().front();
+    QVERIFY(!(output->capabilities() & Output::Capability::Vrr));
+
+    conn->setVrrCapable(true);
+    QVERIFY(gpu->updateOutputs());
+    QCOMPARE(gpu->drmOutputs().front(), output);
+    QVERIFY(output->capabilities() & Output::Capability::Vrr);
 }
 
 QTEST_GUILESS_MAIN(DrmTest)
