@@ -226,6 +226,8 @@ public:
      * @return a unique string that identifies this window
      */
     QString uuid() const;
+    void setExportHandle(const QString &handle);
+    void setGeometryWithoutBorder(const QRect &geometry);
 
 Q_SIGNALS:
     void closeRequested();
@@ -289,6 +291,8 @@ Q_SIGNALS:
      * Requests sending the window to @p output
      */
     void sendToOutput(KWin::OutputInterface *output);
+    void exportHandleChanged(const QString &handle);
+    void geometryWithoutBorderChanged(const QRect &geometry);
 
 private:
     friend class PlasmaWindowManagementInterface;

@@ -24,7 +24,7 @@
 
 namespace KWin
 {
-static const quint32 s_version = 16;
+static const quint32 s_version = 17;
 static const quint32 s_activationVersion = 1;
 
 class PlasmaWindowManagementInterfacePrivate : public QtWaylandServer::org_kde_plasma_window_management
@@ -78,6 +78,8 @@ public:
     void setResourceName(const QString &resourceName);
     void sendInitialState(Resource *resource);
     wl_resource *resourceForParent(PlasmaWindowInterface *parent, Resource *child) const;
+    void setExportHandle(const QString &handle);
+    void setGeometryWithoutBorder(const QRect &geometry);
 
     quint32 windowId = 0;
     QHash<SurfaceInterface *, QRect> minimizedGeometries;
@@ -100,6 +102,8 @@ public:
     quint32 m_state = 0;
     QString uuid;
     QString m_resourceName;
+    QString m_exportHandle;
+    QRect geometryWithoutBorder;
 
 protected:
     Resource *org_kde_plasma_window_allocate() override;
@@ -399,6 +403,16 @@ void PlasmaWindowInterfacePrivate::sendInitialState(Resource *resource)
         if (resource->version() >= ORG_KDE_PLASMA_WINDOW_RESOURCE_NAME_CHANGED_SINCE_VERSION) {
             send_resource_name_changed(resource->handle, m_resourceName);
         }
+    }
+
+    if (!m_exportHandle.isEmpty()) {
+        if (resource->version() >= ORG_KDE_PLASMA_WINDOW_EXPORT_HANDLE_CHANGED_SINCE_VERSION) {
+            send_export_handle_changed(resource->handle, m_exportHandle);
+        }
+    }
+
+    if (geometry.isValid() && resource->version() >= ORG_KDE_PLASMA_WINDOW_GEOMETRY_WITHOUT_BORDER_SINCE_VERSION) {
+        send_geometry_without_border(resource->handle, geometryWithoutBorder.x(), geometryWithoutBorder.y(), geometryWithoutBorder.width(), geometryWithoutBorder.height());
     }
 }
 
@@ -1103,6 +1117,50 @@ void PlasmaWindowActivationInterface::sendAppId(const QString &appid)
     }
 }
 
+void PlasmaWindowInterface::setExportHandle(const QString &handle)
+{
+    d->setExportHandle(handle);
+}
+
+void PlasmaWindowInterfacePrivate::setExportHandle(const QString &handle)
+{
+    if (m_exportHandle == handle) {
+        return;
+    }
+
+    m_exportHandle = handle;
+    const auto clientResources = resourceMap();
+    for (auto resource : clientResources) {
+        if (resource->version() < ORG_KDE_PLASMA_WINDOW_EXPORT_HANDLE_CHANGED_SINCE_VERSION) {
+            continue;
+        }
+        send_export_handle_changed(resource->handle, truncate(m_exportHandle));
+    }
+}
+
+void PlasmaWindowInterface::setGeometryWithoutBorder(const QRect &geometry)
+{
+    d->setGeometryWithoutBorder(geometry);
+}
+
+void PlasmaWindowInterfacePrivate::setGeometryWithoutBorder(const QRect &geometry)
+{
+    if (geometryWithoutBorder == geometry) {
+        return;
+    }
+    geometryWithoutBorder = geometry;
+    if (!geometryWithoutBorder.isValid()) {
+        return;
+    }
+
+    const auto clientResources = resourceMap();
+    for (auto resource : clientResources) {
+        if (resource->version() < ORG_KDE_PLASMA_WINDOW_GEOMETRY_WITHOUT_BORDER_SINCE_VERSION) {
+            continue;
+        }
+        send_geometry_without_border(resource->handle, geometryWithoutBorder.x(), geometryWithoutBorder.y(), geometryWithoutBorder.width(), geometryWithoutBorder.height());
+    }
+}
 }
 
 #include "moc_plasmawindowmanagement.cpp"

@@ -91,6 +91,8 @@ void XdgExporterV2Interface::addExported(XdgExportedSurface *exported)
         m_exportedSurfaces.remove(handle);
     });
     m_exportedSurfaces[handle] = exported;
+#warning todo hold the foreigniface as member maybe? the cast is a bit daft
+    Q_EMIT qobject_cast<XdgForeignV2Interface *>(parent())->surfaceExported(handle, exported->surface());
 }
 
 void XdgExporterV2Interface::zxdg_exporter_v2_destroy(Resource *resource)

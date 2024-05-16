@@ -75,6 +75,8 @@ Q_SIGNALS:
      */
     void transientChanged(KWin::SurfaceInterface *child, KWin::SurfaceInterface *parent);
 
+    void surfaceExported(const QString &handle, SurfaceInterface *surface);
+
 private:
     friend class XdgExporterV2Interface;
     friend class XdgImporterV2Interface;

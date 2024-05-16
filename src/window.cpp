@@ -1897,6 +1897,16 @@ void Window::setupWindowManagementInterface()
         setShade(set);
     });
 
+    w->setExportHandle(exportHandle());
+    connect(this, &Window::exportHandleChanged, w, [w, this]() {
+        w->setExportHandle(exportHandle());
+    });
+
+    w->setGeometryWithoutBorder(clientGeometry().toRect());
+    connect(this, &Window::clientGeometryChanged, w, [w, this]() {
+        w->setGeometryWithoutBorder(clientGeometry().toRect());
+    });
+
     for (const auto vd : std::as_const(m_desktops)) {
         w->addPlasmaVirtualDesktop(vd->id());
     }
@@ -4368,6 +4378,20 @@ void Window::doSetModal()
 {
 }
 
+QString Window::exportHandle() const
+{
+    return m_exportHandle;
+}
+
+void Window::setExportHandle(const QString &handle)
+{
+    if (m_exportHandle == handle) {
+        return;
+    }
+
+    m_exportHandle = handle;
+    Q_EMIT exportHandleChanged();
+}
 } // namespace KWin
 
 #include "moc_window.cpp"

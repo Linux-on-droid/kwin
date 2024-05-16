@@ -542,6 +542,8 @@ class KWIN_EXPORT Window : public QObject
      */
     Q_PROPERTY(bool inputMethod READ isInputMethod)
 
+    Q_PROPERTY(QString exportHandle READ exportHandle WRITE setExportHandle NOTIFY exportHandleChanged)
+
 public:
     ~Window() override;
 
@@ -1321,6 +1323,8 @@ public:
 
     void refOffscreenRendering();
     void unrefOffscreenRendering();
+    [[nodiscard]] QString exportHandle() const;
+    void setExportHandle(const QString &handle);
 
 public Q_SLOTS:
     virtual void closeWindow() = 0;
@@ -1437,6 +1441,7 @@ Q_SIGNALS:
     void readyForPaintingChanged();
     void maximizeGeometryRestoreChanged();
     void fullscreenGeometryRestoreChanged();
+    void exportHandleChanged();
 
 protected:
     Window();
@@ -1837,6 +1842,7 @@ protected:
     bool m_lockScreenOverlay = false;
     uint32_t m_offscreenRenderCount = 0;
     QTimer m_offscreenFramecallbackTimer;
+    QString m_exportHandle;
 };
 
 /**

@@ -463,6 +463,13 @@ bool WaylandServer::init(InitializationFlags flags)
     m_xdgOutputManagerV1 = new XdgOutputManagerV1Interface(m_display, m_display);
     new SubCompositorInterface(m_display, m_display);
     m_XdgForeign = new XdgForeignV2Interface(m_display, m_display);
+    connect(m_XdgForeign, &XdgForeignV2Interface::surfaceExported, this, [this](const auto &handle, const auto &surface) {
+        auto window = findWindow(surface);
+        if (!window) {
+            return;
+        }
+        window->setExportHandle(handle);
+    });
     m_inputMethod = new InputMethodV1Interface(m_display, m_display);
 #if KWIN_BUILD_X11
     m_xWaylandKeyboardGrabManager = new XWaylandKeyboardGrabManagerV1Interface(m_display, m_display);
