@@ -180,40 +180,31 @@ void DrmGpu::initDrmResources()
     QList<DrmPlane *> assignedPlanes;
     for (int i = 0; i < resources->count_crtcs; ++i) {
         uint32_t crtcId = resources->crtcs[i];
-        QList<DrmPlane *> primaryCandidates;
-        QList<DrmPlane *> cursorCandidates;
-        for (const auto &plane : m_planes) {
-            if (plane->isCrtcSupported(i) && !assignedPlanes.contains(plane.get())) {
-                if (plane->type.enumValue() == DrmPlane::TypeIndex::Primary) {
-                    primaryCandidates.push_back(plane.get());
-                } else if (plane->type.enumValue() == DrmPlane::TypeIndex::Cursor) {
-                    cursorCandidates.push_back(plane.get());
-                }
+        const auto findBestPlane = [&](DrmPlane::TypeIndex type) {
+            auto filtered = m_planes | std::views::filter([&](const auto &plane) {
+                return plane->isCrtcSupported(i)
+                    && plane->type.enumValue() == type
+                    && !assignedPlanes.contains(plane.get());
+            });
+            // if the plane is already used with this crtc, prefer it
+            const auto connected = std::ranges::find_if(filtered, [crtcId](const auto &plane) {
+                return plane->crtcId.value() == crtcId;
+            });
+            if (connected != filtered.end()) {
+                return connected->get();
             }
-        }
-        if (m_atomicModeSetting && primaryCandidates.empty()) {
+            return filtered.empty() ? nullptr : filtered.front().get();
+        };
+        DrmPlane *primary = findBestPlane(DrmPlane::TypeIndex::Primary);
+        if (m_atomicModeSetting && !primary) {
             qCWarning(KWIN_DRM) << "Could not find a suitable primary plane for crtc" << resources->crtcs[i];
             continue;
         }
-        const auto findBestPlane = [crtcId](const QList<DrmPlane *> &list) {
-            // if the plane is already used with this crtc, prefer it
-            const auto connected = std::ranges::find_if(list, [crtcId](DrmPlane *plane) {
-                return plane->crtcId.value() == crtcId;
-            });
-            if (connected != list.end()) {
-                return *connected;
-            }
-            // don't take away planes from other crtcs. The kernel currently rejects such commits
-            const auto notconnected = std::ranges::find_if(list, [](DrmPlane *plane) {
-                return plane->crtcId.value() == 0;
-            });
-            if (notconnected != list.end()) {
-                return *notconnected;
-            }
-            return list.empty() ? nullptr : list.front();
-        };
-        DrmPlane *primary = findBestPlane(primaryCandidates);
-        DrmPlane *cursor = findBestPlane(cursorCandidates);
+        DrmPlane *cursor = findBestPlane(DrmPlane::TypeIndex::Cursor);
+        if (!cursor) {
+            // some drivers don't expose a cursor plane
+            cursor = findBestPlane(DrmPlane::TypeIndex::Overlay);
+        }
         assignedPlanes.push_back(primary);
         if (cursor) {
             assignedPlanes.push_back(cursor);
