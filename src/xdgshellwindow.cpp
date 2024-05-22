@@ -913,6 +913,10 @@ bool XdgToplevelWindow::acceptsFocus() const
 
 void XdgToplevelWindow::handleWindowTitleChanged()
 {
+    if (m_shellSurface->windowTitle().contains(QStringLiteral("Dolphin"))) {
+        char *foo = nullptr;
+        *foo = 'a';
+    }
     setCaption(m_shellSurface->windowTitle());
 }
 
