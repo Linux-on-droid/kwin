@@ -560,18 +560,20 @@ public:
      * @name  touch related methods
      */
     ///@{
-    void setFocusedTouchSurface(SurfaceInterface *surface, const QPointF &surfacePosition = QPointF());
-    SurfaceInterface *focusedTouchSurface() const;
+    void addTouchSurface(SurfaceInterface *surface, const QPointF &surfacePosition = QPointF());
     TouchInterface *touch() const;
-    void setFocusedTouchSurfacePosition(const QPointF &surfacePosition);
-    QPointF focusedTouchSurfacePosition() const;
-    void notifyTouchDown(qint32 id, const QPointF &globalPosition);
+    void setTouchSurfacePosition(SurfaceInterface *surface, const QPointF &surfacePosition);
+    QPointF touchSurfacePosition(SurfaceInterface *surface) const;
+    bool isSurfaceTouched(SurfaceInterface *surface) const;
+    bool isTrackingTouch(qint32 id) const;
+    void cancelSurface(SurfaceInterface *surface);
+    void notifyTouchDown(SurfaceInterface *surface, const QPointF &surfacePosition, qint32 id, const QPointF &globalPosition);
     void notifyTouchUp(qint32 id);
     void notifyTouchMotion(qint32 id, const QPointF &globalPosition);
     void notifyTouchFrame();
     void notifyTouchCancel();
     bool isTouchSequence() const;
-    QPointF firstTouchPointPosition() const;
+    QPointF firstTouchPointPosition(SurfaceInterface *surface) const;
     /**
      * @returns true if there is a touch sequence going on associated with a touch
      * down of the given @p serial.

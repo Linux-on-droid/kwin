@@ -112,16 +112,23 @@ public:
     // Touch related members
     struct Touch
     {
-        struct Focus
+        struct Interaction
         {
             SurfaceInterface *surface = nullptr;
             QMetaObject::Connection destroyConnection;
             QPointF offset = QPointF();
             QPointF firstTouchPos;
             QMatrix4x4 transformation;
+            uint refs = 0;
         };
-        Focus focus;
-        QMap<qint32, quint32> ids;
+        QMap<SurfaceInterface *, Interaction> focus;
+
+        struct TouchPoint
+        {
+            quint32 serial;
+            SurfaceInterface *surface;
+        };
+        QMap<qint32, TouchPoint> ids;
     };
     Touch globalTouch;
 

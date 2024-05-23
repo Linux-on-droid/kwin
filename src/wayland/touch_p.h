@@ -26,7 +26,6 @@ public:
     bool hasTouchesForClient(ClientConnection *client) const;
 
     TouchInterface *q;
-    QPointer<SurfaceInterface> focusedSurface;
     SeatInterface *seat;
 
 protected:
