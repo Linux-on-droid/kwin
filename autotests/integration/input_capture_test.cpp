@@ -233,7 +233,7 @@ void TestInputCapture::testInputCapture()
     QCOMPARE(ei_event_get_type(event), EI_EVENT_FRAME);
     ei_event_unref(event);
 
-    connect(&eiNotifier, &QSocketNotifier::activated, this, [] {
+    connect(&eiNotifier, &QSocketNotifier::activated, this, [ei] {
         qDebug() << "socketActivated";
     });
 
@@ -263,6 +263,7 @@ void TestInputCapture::testInputCapture()
     if (!eiReadableSpy.empty()) {
         // On FreeBSD CI the socketnotifier activates but there are no events!?
         ei_dispatch(ei);
+        qDebug() << ei_peek_event(ei) <<  QTest::toString(ei_event_get_type(ei_peek_event(ei)));
         QVERIFY2(!ei_peek_event(ei), QTest::toString(ei_event_get_type(ei_peek_event(ei))));
     }
 
