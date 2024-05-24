@@ -1411,10 +1411,10 @@ public:
             e.setAccepted(false);
             QCoreApplication::sendEvent(decoration->decoration(), &e);
             if (!e.isAccepted() && event->type() == QEvent::MouseButtonPress) {
-                decoration->window()->processDecorationButtonPress(&e);
+                decoration->window()->processDecorationButtonPress(p, event->screenPos(), event->button());
             }
             if (event->type() == QEvent::MouseButtonRelease) {
-                decoration->window()->processDecorationButtonRelease(&e);
+                decoration->window()->processDecorationButtonRelease(event->button());
             }
             return true;
         }
@@ -1484,7 +1484,7 @@ public:
         e.setAccepted(false);
         QCoreApplication::sendEvent(decoration->decoration(), &e);
         if (!e.isAccepted()) {
-            decoration->window()->processDecorationButtonPress(&e);
+            decoration->window()->processDecorationButtonPress(m_lastLocalTouchPos, m_lastGlobalTouchPos, Qt::LeftButton);
         }
         return true;
     }
@@ -1534,7 +1534,7 @@ public:
         QMouseEvent e(QEvent::MouseButtonRelease, m_lastLocalTouchPos, m_lastGlobalTouchPos, Qt::LeftButton, Qt::MouseButtons(), input()->keyboardModifiers());
         e.setAccepted(false);
         QCoreApplication::sendEvent(decoration->decoration(), &e);
-        decoration->window()->processDecorationButtonRelease(&e);
+        decoration->window()->processDecorationButtonRelease(Qt::LeftButton);
 
         QHoverEvent leaveEvent(QEvent::HoverLeave, QPointF(), QPointF());
         QCoreApplication::sendEvent(decoration->decoration(), &leaveEvent);
@@ -1571,10 +1571,10 @@ public:
             e.setAccepted(false);
             QCoreApplication::sendEvent(decoration->decoration(), &e);
             if (!e.isAccepted() && isPressed) {
-                decoration->window()->processDecorationButtonPress(&e);
+                decoration->window()->processDecorationButtonPress(p, event->globalPosF(), Qt::LeftButton);
             }
             if (event->type() == QEvent::TabletRelease) {
-                decoration->window()->processDecorationButtonRelease(&e);
+                decoration->window()->processDecorationButtonRelease(Qt::LeftButton);
             }
             break;
         }
