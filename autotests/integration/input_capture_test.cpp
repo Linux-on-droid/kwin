@@ -233,6 +233,10 @@ void TestInputCapture::testInputCapture()
     QCOMPARE(ei_event_get_type(event), EI_EVENT_FRAME);
     ei_event_unref(event);
 
+    connect(&eiNotifier, &QSocketNotifier::activated, this, [] {
+        qDebug() << "socketActivated";
+    });
+
     msg = QDBusMessage::createMethodCall(QDBusConnection::sessionBus().baseService(), capturePath.path(), kwinInputCaptureInterface, QStringLiteral("release"));
     msg << QVariant::fromValue(QPointF(1, 1)) << true;
     QDBusReply<void> releaseReply = QDBusConnection::sessionBus().call(msg);
@@ -243,6 +247,8 @@ void TestInputCapture::testInputCapture()
     QVERIFY(eiReadableSpy.wait());
     ei_dispatch(ei);
     eiReadableSpy.clear();
+
+    qDebug() << "--------------------------------------------------";
 
     Test::pointerMotion({2, 2}, ++timestamp);
     Test::pointerButtonPressed(BTN_LEFT, ++timestamp);
