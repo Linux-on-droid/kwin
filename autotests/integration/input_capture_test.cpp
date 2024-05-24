@@ -157,6 +157,9 @@ void TestInputCapture::testInputCapture()
     Test::pointerMotionRelative(delta, ++timestamp);
     Test::waylandSync();
     QVERIFY(motionSpy.empty());
+    if (!ei_peek_event(ei)) {
+        QVERIFY(eiReadableSpy.wait());
+    }
     ei_dispatch(ei);
     for (int i = 0; i < numDevices; ++i) {
         auto event = ei_get_event(ei);
