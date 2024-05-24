@@ -260,7 +260,11 @@ void TestInputCapture::testInputCapture()
     QVERIFY(buttonSpy.count());
     QVERIFY(axisSpy.count());
     QVERIFY(keySpy.count());
-    QVERIFY(eiReadableSpy.empty());
+    if (!eiReadableSpy.empty()) {
+        // On FreeBSD CI the socketnotifier activates but there are no events!?
+        ei_dispatch(ei);
+        QVERIFY2(!ei_peek_event(ei), QTest::toString(ei_event_get_type(ei_peek_event(ei))));
+    }
 
     ei_unref(ei);
     msg = QDBusMessage::createMethodCall(QDBusConnection::sessionBus().baseService(), kwinInputCapturePath, kwinInputCaptureManagerInterface, QStringLiteral("removeInputCapture"));
