@@ -128,6 +128,7 @@ void TestInputCapture::testInputCapture()
 
     auto ei = ei_new_receiver(nullptr);
     ei_setup_backend_fd(ei, eisReply.value().takeFileDescriptor());
+    ei_log_set_priority(ei, EI_LOG_PRIORITY_DEBUG);
     QSocketNotifier eiNotifier(ei_get_fd(ei), QSocketNotifier::Read);
     QSignalSpy eiReadableSpy(&eiNotifier, &QSocketNotifier::activated);
 
