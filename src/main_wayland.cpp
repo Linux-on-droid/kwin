@@ -14,6 +14,7 @@
 #include "backends/virtual/virtual_backend.h"
 #include "backends/wayland/wayland_backend.h"
 #include "backends/x11/windowed/x11_windowed_backend.h"
+#include "backends/hwcomposer/hwcomposer_backend.h"
 #include "compositor_wayland.h"
 #include "core/outputbackend.h"
 #include "core/session.h"
@@ -370,6 +371,7 @@ int main(int argc, char *argv[])
     parser.addOption(x11DisplayOption);
 #endif
     parser.addOption(waylandDisplayOption);
+    parser.addOption(hwcomposerDisplayOption);
     parser.addOption(virtualFbOption);
     parser.addOption(widthOption);
     parser.addOption(heightOption);
@@ -436,6 +438,7 @@ int main(int argc, char *argv[])
         Kms,
         X11,
         Wayland,
+        Hwcomposer,
         Virtual,
     };
 
@@ -454,6 +457,8 @@ int main(int argc, char *argv[])
 #endif
     } else if (parser.isSet(waylandDisplayOption)) {
         backendType = BackendType::Wayland;
+    } else if (parser.isSet(hwcomposerDisplayOption)) {
+        backendType = BackendType::Hwcomposer;
     } else if (parser.isSet(virtualFbOption)) {
         backendType = BackendType::Virtual;
     } else {
@@ -590,6 +595,14 @@ int main(int argc, char *argv[])
         }));
         break;
     }
+    case BackendType::Hwcomposer:
+        a.setSession(KWin::Session::create());
+        if (!a.session()) {
+            std::cerr << "FATAl ERROR: could not acquire a session" << std::endl;
+            return 1;
+        }
+        a.setOutputBackend(std::make_unique<KWin::HwcomposerBackend>(a.session()));
+        break;
     }
 
     QObject::connect(&a, &KWin::Application::workspaceCreated, server, &KWin::WaylandServer::initWorkspace);
