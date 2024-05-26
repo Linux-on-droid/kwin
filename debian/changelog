@@ -1,3 +1,12 @@
+kwin (1-lindroid) unstable; urgency=medium
+
+  [ Patrick Franz ]
+  * Bump Standards-Version to 4.7.0 (No changes needed).
+  * New upstream release (5.27.11).
+  * Update build-deps and deps with the info from cmake.
+
+ -- Luka Panio <lukapanio@gmail.com>  Sun, 26 May 2024 18:55:38 +0200
+
 kwin (4:5.27.11-1) unstable; urgency=medium
 
   [ Patrick Franz ]
