@@ -31,3 +31,9 @@ CMakeLists.txt.user*
 *.deb
 obj-aarch64-linux-gnu/
 debian/tmp/
+debian/kwin-data/
+debian/.debhelper/
+debian/kwin-common/
+debian/kwin-dev/
+debian/libkwinglutils14/
+debian/kwin-x11/

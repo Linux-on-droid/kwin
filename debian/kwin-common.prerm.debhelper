@@ -1,7 +1,0 @@
-# Automatically added by dh_installdeb/13.15.3
-dpkg-maintscript-helper rm_conffile /etc/xdg/aurorae.knsrc 4:5.17.5\~ -- "$@"
-dpkg-maintscript-helper rm_conffile /etc/xdg/kwineffect.knsrc 4:5.17.5\~ -- "$@"
-dpkg-maintscript-helper rm_conffile /etc/xdg/kwinscripts.knsrc 4:5.17.5\~ -- "$@"
-dpkg-maintscript-helper rm_conffile /etc/xdg/kwinswitcher.knsrc 4:5.17.5-3\~ -- "$@"
-dpkg-maintscript-helper rm_conffile /etc/xdg/org_kde_kwin.categories 4:5.17.5\~ -- "$@"
-# End automatically added section

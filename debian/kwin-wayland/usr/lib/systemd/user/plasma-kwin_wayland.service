@@ -1,8 +1,0 @@
-[Unit]
-Description=KDE Window Manager
-PartOf=graphical-session.target
-
-[Service]
-ExecStart=/usr/bin/kwin_wayland_wrapper --xwayland
-BusName=org.kde.KWinWrapper
-Slice=session.slice
