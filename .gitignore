@@ -25,3 +25,9 @@ CMakeLists.txt.user*
 .idea
 /cmake-build*
 .cache
+.pc/
+*.buildinfo
+*.changes
+*.deb
+obj-aarch64-linux-gnu/
+debian/tmp/

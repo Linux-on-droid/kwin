@@ -1,0 +1,6 @@
+90c016ce1e582a2658d31f200a9933b0  usr/bin/kwin_wayland
+2234ff6b9ac6af9ea428a72dbb70ba17  usr/bin/kwin_wayland_wrapper
+02123a6ea98b6322b4785673d6ee5de8  usr/lib/systemd/user/plasma-kwin_wayland.service
+dda7197cf407e104f47e9b7a69612123  usr/share/doc/kwin-wayland/changelog.gz
+1c42beba2be4ecc3f8e8565781c1d68b  usr/share/doc/kwin-wayland/copyright
+f8d1aef0ce3fb022e2fcfb963eb60d83  usr/share/lintian/overrides/kwin-wayland

@@ -1,0 +1,7 @@
+kwin-common
+kwin-data
+kwin-dev
+kwin-wayland
+kwin-x11
+libkwineffects14
+libkwinglutils14
