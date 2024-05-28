@@ -323,6 +323,7 @@ int main(int argc, char *argv[])
                                             i18n("The Wayland Display to use in windowed mode on platform Wayland."),
                                             QStringLiteral("display"));
     QCommandLineOption virtualFbOption(QStringLiteral("virtual"), i18n("Render to a virtual framebuffer."));
+    QCommandLineOption hwcomposerFbOption(QStringLiteral("hwcomposer"), "Render through hwc");
     QCommandLineOption widthOption(QStringLiteral("width"),
                                    i18n("The width for windowed mode. Default width is 1024."),
                                    QStringLiteral("width"));
@@ -375,7 +376,7 @@ int main(int argc, char *argv[])
     parser.addOption(replaceOption);
     parser.addOption(x11DisplayOption);
     parser.addOption(waylandDisplayOption);
-    parser.addOption(hwcomposerDisplayOption);
+    parser.addOption(hwcomposerFbOption);
     parser.addOption(virtualFbOption);
     parser.addOption(widthOption);
     parser.addOption(heightOption);
@@ -459,7 +460,7 @@ int main(int argc, char *argv[])
         backendType = BackendType::X11;
     } else if (parser.isSet(waylandDisplayOption)) {
         backendType = BackendType::Wayland;
-    } else if (parser.isSet(hwcomposerDisplayOption)) {
+    } else if (parser.isSet(hwcomposerFbOption)) {
         backendType = BackendType::Hwcomposer;
     } else if (parser.isSet(virtualFbOption)) {
         backendType = BackendType::Virtual;

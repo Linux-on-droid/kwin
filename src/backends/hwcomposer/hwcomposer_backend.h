@@ -8,20 +8,28 @@
 */
 #ifndef KWIN_HWCOMPOSER_BACKEND_H
 #define KWIN_HWCOMPOSER_BACKEND_H
-#include "platform.h"
-#include "abstract_wayland_output.h"
+#include "core/outputbackend.h"
+#include "core/output.h"
 #include "input.h"
+#include "backends/libinput/libinputbackend.h"
 
 #include <QElapsedTimer>
 #include <QMutex>
 #include <QWaitCondition>
-
-#include <android-config.h>
+#include <QSemaphore>
+#include <QFile>
 // libhybris
 #include <hardware/hwcomposer.h>
 #include <hwcomposer_window.h>
+#include <hybris/hwc2/hwc2_compatibility_layer.h>
+#include <hybris/hwcomposerwindow/hwcomposer.h>
+#include <QBasicTimer>
+
 // needed as hwcomposer_window.h includes EGL which on non-arm includes Xlib
 #include <fixx11h.h>
+#include "core/renderloop.h"
+#include "wayland/output_interface.h"
+
 
 typedef struct hwc_display_contents_1 hwc_display_contents_1_t;
 typedef struct hwc_layer_1 hwc_layer_1_t;
@@ -34,58 +42,75 @@ namespace KWin
 {
 
 class HwcomposerWindow;
+class HwcomposerBackend;
 class BacklightInputEventFilter;
 
-class HwcomposerOutput : public AbstractWaylandOutput
+
+class HwcomposerOutput : public Output
 {
     Q_OBJECT
 public:
-    HwcomposerOutput(hwc_composer_device_1_t *device);
+    HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t* hwc2_primary_display);
     ~HwcomposerOutput() override;
-    bool isValid() const;
 
-    void updateDpms(KWaylandServer::OutputInterface::DpmsMode mode) override;
+    void init();
+
+    RenderLoop *renderLoop() const override;
+    bool isValid() const;
+    bool hardwareTransforms() const;
+    void setDpmsMode(DpmsMode mode) override;
+    void updateDpmsMode(DpmsMode mode);
+    void updateEnabled(bool enable);
+    bool isEnabled() const;
 Q_SIGNALS:
-    void dpmsModeRequested(KWaylandServer::OutputInterface::DpmsMode mode);
+    void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
 private:
     QSize m_pixelSize;
-    hwc_composer_device_1_t *m_device;
+    hwc2_compat_display_t *m_hwc2_primary_display;
+    friend class HwcomposerBackend;
+    std::unique_ptr<RenderLoop> m_renderLoop;
+    HwcomposerBackend *m_backend;
+    bool m_isEnabled = true;
 };
 
-class HwcomposerBackend : public Platform
+class KWIN_EXPORT HwcomposerBackend : public OutputBackend
 {
     Q_OBJECT
-
 public:
-    explicit HwcomposerBackend(QObject *parent = nullptr);
+    explicit HwcomposerBackend(Session *session, QObject *parent = nullptr);
     virtual ~HwcomposerBackend();
 
-    void init() override;
-    OpenGLBackend *createOpenGLBackend() override;
+    Session *session() const;
+    bool initialize() override;
+    std::unique_ptr<OpenGLBackend> createOpenGLBackend() override;
 
     Outputs outputs() const override;
-    Outputs enabledOutputs() const override;
 
     QSize size() const;
-    QSize screenSize() const override;
 
     int scale() const;
 
     HwcomposerWindow *createSurface();
 
-    hwc_composer_device_1_t *device() const {
-        return m_device;
-    }
+    std::unique_ptr<InputBackend> createInputBackend() override;
+
     void enableVSync(bool enable);
     void waitVSync();
     void wakeVSync();
+    QVector<CompositingType> supportedCompositors() const override {
+        return QVector<CompositingType>{OpenGLCompositing};
+    }
 
     bool isBacklightOff() const {
         return m_outputBlank;
     }
 
-    QVector<CompositingType> supportedCompositors() const override {
-        return QVector<CompositingType>{OpenGLCompositing};
+    hwc2_compat_device_t *hwc2_device() const {
+        return m_hwc2device;
+    }
+
+    hwc2_compat_display_t *hwc2_display() const {
+        return m_hwc2_primary_display;
     }
 
 Q_SIGNALS:
@@ -97,49 +122,60 @@ private Q_SLOTS:
         m_oldScreenBrightness = brightness;
     }
 
+    void compositing(int flags);
+
 private:
-    void initLights();
+    friend HwcomposerWindow;   
+    void setPowerMode(bool enable);
+    bool updateOutputs();
+    void updateOutputsEnabled();  
     void toggleScreenBrightness();
-    hwc_composer_device_1_t *m_device = nullptr;
+    void initLights();
+    Session *m_session;
     light_device_t *m_lights = nullptr;
-    bool m_outputBlank = true;
     int m_vsyncInterval = 16;
-    uint32_t m_hwcVersion;
-    int m_oldScreenBrightness = 0x7f;
     bool m_hasVsync = false;
     QMutex m_vsyncMutex;
     QWaitCondition m_vsyncWaitCondition;
-    QScopedPointer<BacklightInputEventFilter> m_filter;
-    QScopedPointer<HwcomposerOutput> m_output;
+    QSemaphore     m_compositingSemaphore;
+    std::unique_ptr<BacklightInputEventFilter> m_filter;
+    std::unique_ptr<HwcomposerOutput> m_output;
+    bool m_outputBlank = true;    
+    int m_oldScreenBrightness = 0x7f;
+
+    void RegisterCallbacks();
+
+    hwc2_compat_device_t *m_hwc2device = nullptr;
+    hwc2_compat_display_t* m_hwc2_primary_display = nullptr;
 };
 
 class HwcomposerWindow : public HWComposerNativeWindow
 {
 public:
     virtual ~HwcomposerWindow();
-
-    void present(HWComposerNativeWindowBuffer *buffer);
+    void present(HWComposerNativeWindowBuffer *buffer) override;
 
 private:
     friend HwcomposerBackend;
     HwcomposerWindow(HwcomposerBackend *backend);
     HwcomposerBackend *m_backend;
-    hwc_display_contents_1_t **m_list;
+    int lastPresentFence = -1;
+
+    hwc2_compat_display_t *m_hwc2_primary_display = nullptr;
 };
 
-class BacklightInputEventFilter : public InputEventFilter
+class BacklightInputEventFilter : public QObject,  public InputEventFilter
 {
 public:
     BacklightInputEventFilter(HwcomposerBackend *backend);
     virtual ~BacklightInputEventFilter();
 
-    bool pointerEvent(QMouseEvent *event, quint32 nativeButton) override;
-    bool wheelEvent(QWheelEvent *event) override;
-    bool keyEvent(QKeyEvent *event) override;
-    bool touchDown(qint32 id, const QPointF &pos, quint32 time) override;
-    bool touchMotion(qint32 id, const QPointF &pos, quint32 time) override;
-    bool touchUp(qint32 id, quint32 time) override;
-
+    bool pointerEvent(QMouseEvent *event, quint32 nativeButton);
+    bool wheelEvent(QWheelEvent *event);
+    bool keyEvent(QKeyEvent *event);
+    bool touchDown(qint32 id, const QPointF &pos, quint32 time);
+    bool touchMotion(qint32 id, const QPointF &pos, quint32 time);
+    bool touchUp(qint32 id, quint32 time);
 private:
     void toggleBacklight();
     HwcomposerBackend *m_backend;
