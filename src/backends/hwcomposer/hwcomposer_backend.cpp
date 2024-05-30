@@ -9,17 +9,16 @@
 #include "hwcomposer_backend.h"
 
 #include "composite.h"
-#include "egl_hwcomposer_backend.h"
-#include "logging.h"
+#include "hwcomposer_egl_backend.h"
+#include "hwcomposer_logging.h"
 #include "main.h"
-#include "scene.h"
-#include "session.h"
-
+#include "scene/workspacescene.h"
+#include "backends/libinput/libinputbackend.h"
 //#include "screens_hwcomposer.h"
 #include "wayland_server.h"
 // KWayland
-#include <KWaylandServer/output_interface.h>
-#include <KWaylandServer/seat_interface.h>
+#include "wayland/output_interface.h"
+#include "wayland/seat_interface.h"
 // KDE
 #include <KConfigGroup>
 // Qt
@@ -38,9 +37,12 @@
 #include <QDBusError>
 #include <QtConcurrent>
 #include <QDBusMessage>
-#include "renderloop_p.h"
+#include "core/renderloop_p.h"
 #include "composite.h"
 // based on test_hwcomposer.c from libhybris project (Apache 2 licensed)
+
+#include "core/output.h"
+#include "core/outputconfiguration.h"
 
 using namespace KWaylandServer;
 
@@ -142,12 +144,11 @@ void BacklightInputEventFilter::toggleBacklight()
     QMetaObject::invokeMethod(m_backend, "toggleBlankOutput", Qt::QueuedConnection);
 }
 
-HwcomposerBackend::HwcomposerBackend(QObject *parent)
-    : Platform(parent)
-    , m_session(Session::create(this))
+HwcomposerBackend::HwcomposerBackend(Session *session, QObject *parent)
+    : OutputBackend(parent)
+    , m_session(session)
 {
-    setPerScreenRenderingEnabled(true);
-    supportsOutputChanges();
+ //   setPerScreenRenderingEnabled(true);
 
     if (!QDBusConnection::sessionBus().connect(QStringLiteral("org.kde.Solid.PowerManagement"),
                                               QStringLiteral("/org/kde/Solid/PowerManagement/Actions/BrightnessControl"),
@@ -158,16 +159,16 @@ HwcomposerBackend::HwcomposerBackend(QObject *parent)
     }
 }
 
+Session *HwcomposerBackend::session() const
+{
+    return m_session;
+}
+
 HwcomposerBackend::~HwcomposerBackend()
 {
     if (sceneEglDisplay() != EGL_NO_DISPLAY) {
         eglTerminate(sceneEglDisplay());
     }
-}
-
-Session *HwcomposerBackend::session() const
-{
-    return m_session;
 }
 
 void HwcomposerBackend::toggleBlankOutput()
@@ -182,7 +183,7 @@ void HwcomposerBackend::toggleBlankOutput()
     hwc2_compat_display_set_power_mode(m_hwc2_primary_display, m_outputBlank ? HWC2_POWER_MODE_OFF : HWC2_POWER_MODE_ON);
 
     // enable/disable compositor repainting when blanked
-    if (!m_output.isNull()) m_output.data()->setEnabled(!m_outputBlank);
+    if (m_output != nullptr) m_output.get()->updateEnabled(!m_outputBlank);
     if (Compositor *compositor = Compositor::self()) {
         if (!m_outputBlank) {
             compositor->scene()->addRepaintFull();
@@ -190,7 +191,7 @@ void HwcomposerBackend::toggleBlankOutput()
     }
     if (m_outputBlank){
         m_filter.reset(new BacklightInputEventFilter(this));
-        input()->prependInputEventFilter(m_filter.data());
+        input()->prependInputEventFilter(m_filter.get());
     } else m_filter.reset();
     Q_EMIT outputBlankChanged();
 }
@@ -279,17 +280,17 @@ bool HwcomposerBackend::initialize()
         m_vsyncInterval = 1000000/m_output->refreshRate();
     }
 
-    m_output->setDpmsMode(HwcomposerOutput::DpmsMode::On);
+    m_output->updateDpmsMode(HwcomposerOutput::DpmsMode::On);
 
     if (m_lights) {
         auto updateDpms = [this] {
             if (m_output) {
-                m_output->setDpmsModeInternal(m_outputBlank ? HwcomposerOutput::DpmsMode::Off : HwcomposerOutput::DpmsMode::On);
+                m_output->updateDpmsMode(m_outputBlank ? HwcomposerOutput::DpmsMode::Off : HwcomposerOutput::DpmsMode::On);
             }
         };
         connect(this, &HwcomposerBackend::outputBlankChanged, this, updateDpms);
 
-        connect(m_output.data(), &HwcomposerOutput::dpmsModeRequested, this,
+        connect(m_output.get(), &HwcomposerOutput::dpmsModeRequested, this,
             [this] (HwcomposerOutput::DpmsMode mode) {
                 if (mode == HwcomposerOutput::DpmsMode::On) {
                     if (m_outputBlank) {
@@ -304,11 +305,10 @@ bool HwcomposerBackend::initialize()
         );
     }
 
-    Q_EMIT outputAdded(m_output.data());
-    Q_EMIT outputEnabled(m_output.data());
+    Q_EMIT outputAdded(m_output.get());
+    m_output.get()->updateEnabled(true);
 
-    setReady(true);
-    Q_EMIT screensQueried();
+    Q_EMIT outputsQueried();
 
     return true;
 }
@@ -328,23 +328,15 @@ void HwcomposerBackend::initLights()
     m_lights = lightsDevice;
 }
 
-InputBackend *HwcomposerBackend::createInputBackend()
+std::unique_ptr<InputBackend>HwcomposerBackend::createInputBackend()
 {
-    return new LibinputBackend(this);
+    return std::make_unique<LibinputBackend>(m_session);
 }
 
 QSize HwcomposerBackend::size() const
 {
     if (m_output) {
         return m_output->pixelSize();
-    }
-    return QSize();
-}
-
-QSize HwcomposerBackend::screenSize() const
-{
-    if (m_output) {
-        return m_output->pixelSize() / m_output->scale();
     }
     return QSize();
 }
@@ -373,15 +365,10 @@ HwcomposerWindow *HwcomposerBackend::createSurface()
 
 Outputs HwcomposerBackend::outputs() const
 {
-    if (!m_output.isNull()) {
-        return QVector<HwcomposerOutput *>({m_output.data()});
+    if (m_output != nullptr) {
+        return QVector<HwcomposerOutput *>({m_output.get()});
     }
     return {};
-}
-
-Outputs HwcomposerBackend::enabledOutputs() const
-{
-    return outputs();
 }
 
 void HwcomposerBackend::updateOutputsEnabled()
@@ -390,13 +377,13 @@ void HwcomposerBackend::updateOutputsEnabled()
 bool HwcomposerBackend::updateOutputs()
 {
     updateOutputsEnabled();
-    Q_EMIT screensQueried();
+    Q_EMIT outputsQueried();
 
     return true;
 }
-OpenGLBackend *HwcomposerBackend::createOpenGLBackend()
+std::unique_ptr<OpenGLBackend> HwcomposerBackend::createOpenGLBackend()
 {
-    return new EglHwcomposerBackend(this);
+    return std::make_unique<EglHwcomposerBackend>(this);
 }
 
 void HwcomposerBackend::waitVSync()
@@ -512,10 +499,10 @@ bool HwcomposerOutput::hardwareTransforms() const
     return false;
 }
 
-HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *hwc2_primary_display)
-    : AbstractWaylandOutput(), m_renderLoop(new RenderLoop(this)), m_hwc2_primary_display(hwc2_primary_display), m_backend(backend)
-{
-    int32_t attr_values[5];
+//HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *hwc2_primary_display)
+//    : Output(), m_renderLoop(std::make_unique<RenderLoop>()), m_hwc2_primary_display(hwc2_primary_display), m_backend(backend)
+//{
+/*    int32_t attr_values[5];
     HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(hwc2_primary_display);
     Q_ASSERT(config);
     attr_values[0] = config->width;
@@ -557,9 +544,9 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
             physicalSize = pixelSize / debugDpi.toFloat();
         }
     }
-
+*/
     // read in mode information
-    QVector<Mode> modes;
+ /*   QVector<Mode> modes;
     {
         ModeFlags deviceflags = 0;
         deviceflags |= ModeFlag::Current;
@@ -572,26 +559,116 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
         mode.refreshRate = (attr_values[4] == 0) ? 60000 : 10E11 / attr_values[4];
         modes << mode;
     }
-    initialize(QString(), QString(), QString(), QString(), physicalSize.toSize(), modes, {});
-    setInternal(true);
-    setCapabilityInternal(HwcomposerOutput::Capability::Dpms);
+    initialize(QString(), QString(), QString(), QString(), physicalSize.toSize(), modes, {});*/
+  //  setInternal(true);
+  //  setCapabilityInternal(HwcomposerOutput::Capability::Dpms);
 
 
-    const auto outputGroup = kwinApp()->config()->group("HWComposerOutputs").group("0");
-    setCurrentModeInternal(pixelSize, modes[0].refreshRate);
+  //  const auto outputGroup = kwinApp()->config()->group("HWComposerOutputs").group("0");
+   // setCurrentModeInternal(pixelSize, modes[0].refreshRate);
 
-    const qreal dpi = modeSize().height() / (physicalSize.height() / 25.4);
+    /*const qreal dpi = modeSize().height() / (physicalSize.height() / 25.4);
     KConfig _cfgfonts(QStringLiteral("kcmfonts"));
     KConfigGroup cfgfonts(&_cfgfonts, "General");
     qDebug() << Q_FUNC_INFO << "set default xft dpi: modeSize:" << modeSize() << "physicalSize:" << physicalSize << "dpi:" << dpi;
-    cfgfonts.writeEntry("defaultXftDpi", 192);
-    setScale(1.0);
+    cfgfonts.writeEntry("defaultXftDpi", 192);*/
+ //   setScale(1.0);
 
-    QString debugScale = qgetenv("KWIN_DEBUG_SCALE");
-    if (!debugScale.isEmpty()) {
-        setScale(outputGroup.readEntry("Scale", debugScale.toFloat()));
+//    QString debugScale = qgetenv("KWIN_DEBUG_SCALE");
+//    if (!debugScale.isEmpty()) {
+//        setScale(outputGroup.readEntry("Scale", debugScale.toFloat()));
+//    }
+//}
+
+HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *hwc2_primary_display)
+    : Output(backend)
+    , m_renderLoop(std::make_unique<RenderLoop>())
+    , m_hwc2_primary_display(hwc2_primary_display)
+    , m_backend(backend)
+{
+    // Retrieve and set display configuration attributes
+    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(hwc2_primary_display);
+    Q_ASSERT(config);
+
+    int32_t width = config->width;
+    int32_t height = config->height;
+    int32_t dpiX = config->dpiX;
+    int32_t dpiY = config->dpiY;
+    int32_t vsyncPeriod = (width == 2072) ? 20000000 : config->vsyncPeriod;
+
+    // Override with debug environment variables if they exist
+    QString debugWidth = qgetenv("KWIN_DEBUG_WIDTH");
+    if (!debugWidth.isEmpty()) {
+        width = debugWidth.toInt();
     }
+    QString debugHeight = qgetenv("KWIN_DEBUG_HEIGHT");
+    if (!debugHeight.isEmpty()) {
+        height = debugHeight.toInt();
+    }
+    QSize pixelSize(width, height);
+
+    if (pixelSize.isEmpty()) {
+        return;
+    }
+
+    // Calculate physical size
+    QSizeF physicalSize = pixelSize / 3.8;
+    if (dpiX != 0 && dpiY != 0) {
+        static const qreal factor = 25.4;
+        physicalSize = QSizeF(qreal(pixelSize.width() * 1000) / qreal(dpiX) * factor,
+                              qreal(pixelSize.height() * 1000) / qreal(dpiY) * factor);
+    }
+
+    QString debugDpi = qgetenv("KWIN_DEBUG_DPI");
+    if (!debugDpi.isEmpty() && debugDpi.toFloat() != 0) {
+        physicalSize = pixelSize / debugDpi.toFloat();
+    }
+
+    // Initialize modes
+//    QVector<Mode> modes;
+//    ModeFlags deviceFlags = ModeFlag::Current | ModeFlag::Preferred;
+//    Mode mode = { 0, pixelSize, deviceFlags, (vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod };
+//    modes << mode;
+
+    QList<std::shared_ptr<OutputMode>> modes;
+    OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;
+    std::shared_ptr<OutputMode> mode = std::make_shared<OutputMode>(pixelSize, (vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod, modeFlags);
+    modes << mode;
+    // Set output information
+    Capabilities capabilities = Capability::Dpms;
+    State initialState;
+    
+    // Since Hwcomposer does not provide an EDID structure, we use placeholders for EDID information
+    setInformation(Information{
+        .name = QStringLiteral("hwcomposer"),
+        .manufacturer = QStringLiteral("Android"),
+        .model = QStringLiteral("Lindroid"),
+        .serialNumber = QString(),
+        .eisaId = QString(),
+        .physicalSize = physicalSize.toSize(),
+        .edid = QByteArray(),
+        .subPixel = SubPixel::Unknown,
+        .capabilities = capabilities,
+        .panelOrientation = KWin::Output::Transform::Normal,
+        .internal = false,
+        .nonDesktop = false,
+    });
+
+    initialState.modes = modes;
+    initialState.currentMode = modes.constFirst();
+
+    setState(initialState);
+
+  //  m_turnOffTimer.setSingleShot(true);
+ //   m_turnOffTimer.setInterval(dimAnimationTime());
+//    connect(&m_turnOffTimer, &QTimer::timeout, this, [this] {
+ //       setDpmsMode(DpmsMode::Off)
+            // in case of failure, undo aboutToTurnOff() from setDpmsMode()
+        //    Q_EMIT wakeUp();
+        //}
+   // });
 }
+
 
 HwcomposerOutput::~HwcomposerOutput()
 {
@@ -600,7 +677,7 @@ HwcomposerOutput::~HwcomposerOutput()
     }
 }
 
-void HwcomposerOutput::setEnabled(bool enable) 
+void HwcomposerOutput::updateEnabled(bool enable)
 {
     m_isEnabled = enable;
 }
@@ -612,7 +689,7 @@ bool HwcomposerOutput::isEnabled() const
 
 RenderLoop *HwcomposerOutput::renderLoop() const
 {
-    return m_renderLoop;
+    return m_renderLoop.get();
 }
 
 bool HwcomposerOutput::isValid() const
@@ -621,6 +698,11 @@ bool HwcomposerOutput::isValid() const
 }
 
 void HwcomposerOutput::setDpmsMode(DpmsMode mode)
+{
+
+}
+
+void HwcomposerOutput::updateDpmsMode(DpmsMode mode)
 {
     Q_EMIT dpmsModeRequested(mode);
 }

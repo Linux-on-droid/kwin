@@ -1,24 +1,16 @@
-set(HWCOMPOSER_SOURCES
-    egl_hwcomposer_backend.cpp
+target_sources(kwin PRIVATE
+    hwcomposer_egl_backend.cpp
     hwcomposer_backend.cpp
-    logging.cpp
+    hwcomposer_logging.cpp
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/platformsupport/scenes/opengl)
-add_library(KWinWaylandHwcomposerBackend MODULE ${HWCOMPOSER_SOURCES})
-set_target_properties(KWinWaylandHwcomposerBackend PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/org.kde.kwin.waylandbackends/")
-target_link_libraries(KWinWaylandHwcomposerBackend
-    kwin
+
+
+target_link_libraries(kwin
     libhybris::hwcomposer
     libhybris::hybriseglplatform
     libhybris::libhardware
     -lhwc2 -lsync
     dl
-)
-
-install(
-    TARGETS
-        KWinWaylandHwcomposerBackend
-    DESTINATION
-        ${PLUGIN_INSTALL_DIR}/org.kde.kwin.waylandbackends/
 )
