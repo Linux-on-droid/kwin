@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
             backendType = BackendType::X11;
         } else {
             qWarning("No backend specified, automatically choosing drm");
-            backendType = BackendType::Kms;
+            backendType = BackendType::Hwcomposer;
         }
     }
 
