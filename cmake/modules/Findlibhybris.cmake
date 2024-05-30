@@ -124,6 +124,14 @@ if(NOT WIN32)
             ${PKG_hybriseglplatform_INCLUDE_DIRS}
     )
 
+    # Include additional directory for nativewindowbase.h
+    find_path(hybriseglplatform_ADDITIONAL_INCLUDE_DIR
+        NAMES
+            nativewindowbase.h
+        PATHS
+            /usr/include/hybris/platformcommon/
+    )
+
     include(FindPackageHandleStandardArgs)
     find_package_handle_standard_args(hybriseglplatform
         FOUND_VAR
@@ -140,11 +148,11 @@ if(NOT WIN32)
         set_target_properties(libhybris::hybriseglplatform PROPERTIES
             IMPORTED_LOCATION "${hybriseglplatform_LIBRARY}"
             INTERFACE_COMPILE_OPTIONS "${hybriseglplatform_DEFINITIONS}"
-            INTERFACE_INCLUDE_DIRECTORIES "${hybriseglplatform_INCLUDE_DIR}"
+            INTERFACE_INCLUDE_DIRECTORIES "${hybriseglplatform_INCLUDE_DIR};${hybriseglplatform_ADDITIONAL_INCLUDE_DIR}"
         )
     endif()
 
-    mark_as_advanced(hybriseglplatform_LIBRARY hybriseglplatform_INCLUDE_DIR)
+    mark_as_advanced(hybriseglplatform_LIBRARY hybriseglplatform_INCLUDE_DIR hybriseglplatform_ADDITIONAL_INCLUDE_DIR)
 
     if(libhardware_FOUND AND libhwcomposer_FOUND AND hybriseglplatform_FOUND)
         set(libhybris_FOUND TRUE)
