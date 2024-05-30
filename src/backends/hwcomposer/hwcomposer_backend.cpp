@@ -428,7 +428,6 @@ HwcomposerWindow::HwcomposerWindow(HwcomposerBackend *backend) //! [dba debug: 2
     hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_hwc2_primary_display);
     hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
     hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
-    hwc2_compat_layer_set_transform(layer, HWC_TRANSFORM_ROT_90);
 
     hwc2_compat_layer_set_source_crop(layer, 0.0f, 0.0f, m_backend->size().width(), m_backend->size().height());
     hwc2_compat_layer_set_display_frame(layer, 0, 0, m_backend->size().width(), m_backend->size().height());
