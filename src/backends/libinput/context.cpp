@@ -103,7 +103,7 @@ void Context::closeRestrictedCallBack(int fd, void *user_data)
 
 int Context::openRestricted(const char *path, int flags)
 {
-    int fd = m_session->openRestricted(path);
+    int fd = open(path, flags);
     if (fd < 0) {
         // failed
         return fd;
@@ -147,7 +147,7 @@ int Context::openRestricted(const char *path, int flags)
 
 void Context::closeRestricted(int fd)
 {
-    m_session->closeRestricted(fd);
+    close(fd);
 }
 
 std::unique_ptr<Event> Context::event()
