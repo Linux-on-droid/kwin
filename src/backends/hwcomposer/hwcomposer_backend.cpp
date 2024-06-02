@@ -623,11 +623,15 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
         physicalSize = pixelSize / debugDpi.toFloat();
     }
 
-    // Initialize modes
-//    QVector<Mode> modes;
-//    ModeFlags deviceFlags = ModeFlag::Current | ModeFlag::Preferred;
-//    Mode mode = { 0, pixelSize, deviceFlags, (vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod };
-//    modes << mode;
+    float scale = 1.0;
+    if (dpiX != 0 && dpiY != 0) {
+        float dpi = (dpiX + dpiY) / 2.0;
+        if (dpi > 160) {
+            scale = dpi / 160.0;
+        }
+    } else {
+        scale = std::min(pixelSize.width() / 96.0, pixelSize.height() / 96.0);
+    }
 
     QList<std::shared_ptr<OutputMode>> modes;
     OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;
@@ -655,17 +659,9 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
 
     initialState.modes = modes;
     initialState.currentMode = modes.constFirst();
+    initialState.scale = scale;
 
     setState(initialState);
-
-  //  m_turnOffTimer.setSingleShot(true);
- //   m_turnOffTimer.setInterval(dimAnimationTime());
-//    connect(&m_turnOffTimer, &QTimer::timeout, this, [this] {
- //       setDpmsMode(DpmsMode::Off)
-            // in case of failure, undo aboutToTurnOff() from setDpmsMode()
-        //    Q_EMIT wakeUp();
-        //}
-   // });
 }
 
 
