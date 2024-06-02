@@ -3,13 +3,23 @@
 set -e
 
 if [ "$1" = configure ]; then
-    # Set the capabilities
-    if command -v setcap > /dev/null && \
-       setcap "CAP_SYS_RESOURCE=+ep" \
-            /usr/bin/kwin_wayland; then
-        echo "Sucessfully set capabilities for kwin_wayland"
+    # Check if setcap command is available
+    if command -v setcap > /dev/null; then
+        # Set the new capability
+        if setcap "CAP_DAC_READ_SEARCH=+ep" /usr/bin/kwin_wayland; then
+            echo "Successfully set CAP_DAC_READ_SEARCH for kwin_wayland"
+        else
+            echo "Failed to set CAP_DAC_READ_SEARCH for kwin_wayland" >&2
+        fi
+
+        # Set the existing capability
+        if setcap "CAP_SYS_RESOURCE=+ep" /usr/bin/kwin_wayland; then
+            echo "Successfully set CAP_SYS_RESOURCE for kwin_wayland"
+        else
+            echo "Failed to set CAP_SYS_RESOURCE for kwin_wayland" >&2
+        fi
     else
-        echo "Failed to set capabilities for kwin_wayland" >&2
+        echo "setcap command not found" >&2
     fi
 fi
 
