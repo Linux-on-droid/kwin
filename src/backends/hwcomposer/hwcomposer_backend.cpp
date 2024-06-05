@@ -232,7 +232,7 @@ void hwc2_callback_hotplug(HWC2EventListener *listener, int32_t sequenceId,
 void hwc2_callback_refresh(HWC2EventListener *listener, int32_t sequenceId,
                            hwc2_display_t display)
 {
-
+    static_cast<const HwcProcs_v20 *>(listener)->backend->updateOutputState(display);
 }
 
 void HwcomposerBackend::RegisterCallbacks()
@@ -313,6 +313,13 @@ bool HwcomposerBackend::initialize()
     return true;
 }
 
+void HwcomposerBackend::updateOutputState(hwc2_display_t display) {
+    if (m_output != nullptr) {
+        m_output.get()->setStatesInternal();
+        Q_EMIT outputsQueried();
+    }
+}
+
 void HwcomposerBackend::initLights()
 {
     hw_module_t *lightsModule = nullptr;
@@ -371,16 +378,6 @@ Outputs HwcomposerBackend::outputs() const
     return {};
 }
 
-void HwcomposerBackend::updateOutputsEnabled()
-{}
-
-bool HwcomposerBackend::updateOutputs()
-{
-    updateOutputsEnabled();
-    Q_EMIT outputsQueried();
-
-    return true;
-}
 std::unique_ptr<OpenGLBackend> HwcomposerBackend::createOpenGLBackend()
 {
     return std::make_unique<EglHwcomposerBackend>(this);
@@ -585,8 +582,61 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
     , m_hwc2_primary_display(hwc2_primary_display)
     , m_backend(backend)
 {
+
+    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_hwc2_primary_display);
+    Q_ASSERT(config);
+
+    int32_t width = config->width;
+    int32_t height = config->height;
+    int32_t dpiX = config->dpiX;
+    int32_t dpiY = config->dpiY;
+    QSize pixelSize(width, height);
+    if (pixelSize.isEmpty()) {
+        return;
+    }
+    QSizeF physicalSize = pixelSize / 3.8;
+    if (dpiX != 0 && dpiY != 0) {
+        static const qreal factor = 25.4;
+        physicalSize = QSizeF(qreal(pixelSize.width() * 1000) / qreal(dpiX) * factor,
+                              qreal(pixelSize.height() * 1000) / qreal(dpiY) * factor);
+    }
+    QString debugDpi = qgetenv("KWIN_DEBUG_DPI");
+    if (!debugDpi.isEmpty() && debugDpi.toFloat() != 0) {
+        physicalSize = pixelSize / debugDpi.toFloat();
+    }
+
+    // Set output information
+    // Since Hwcomposer does not provide an EDID structure, we use placeholders for EDID information
+    setInformation(Information{
+        .name = QStringLiteral("hwcomposer"),
+        .manufacturer = QStringLiteral("Android"),
+        .model = QStringLiteral("Lindroid"),
+        .serialNumber = QString(),
+        .eisaId = QString(),
+        .physicalSize = physicalSize.toSize(),
+        .edid = QByteArray(),
+        .subPixel = SubPixel::Unknown,
+        .capabilities = Capability::Dpms,
+        .panelOrientation = KWin::Output::Transform::Normal,
+        .internal = false,
+        .nonDesktop = false,
+    });
+
+    setStatesInternal();
+}
+
+
+HwcomposerOutput::~HwcomposerOutput()
+{
+    if (m_hwc2_primary_display != NULL) {
+        free(m_hwc2_primary_display);
+    }
+}
+
+void HwcomposerOutput::setStatesInternal()
+{
     // Retrieve and set display configuration attributes
-    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(hwc2_primary_display);
+    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_hwc2_primary_display);
     Q_ASSERT(config);
 
     int32_t width = config->width;
@@ -637,39 +687,12 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
     OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;
     std::shared_ptr<OutputMode> mode = std::make_shared<OutputMode>(pixelSize, (vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod, modeFlags);
     modes << mode;
-    // Set output information
-    Capabilities capabilities = Capability::Dpms;
     State initialState;
-    
-    // Since Hwcomposer does not provide an EDID structure, we use placeholders for EDID information
-    setInformation(Information{
-        .name = QStringLiteral("hwcomposer"),
-        .manufacturer = QStringLiteral("Android"),
-        .model = QStringLiteral("Lindroid"),
-        .serialNumber = QString(),
-        .eisaId = QString(),
-        .physicalSize = physicalSize.toSize(),
-        .edid = QByteArray(),
-        .subPixel = SubPixel::Unknown,
-        .capabilities = capabilities,
-        .panelOrientation = KWin::Output::Transform::Normal,
-        .internal = false,
-        .nonDesktop = false,
-    });
-
     initialState.modes = modes;
     initialState.currentMode = modes.constFirst();
     initialState.scale = scale;
 
     setState(initialState);
-}
-
-
-HwcomposerOutput::~HwcomposerOutput()
-{
-    if (m_hwc2_primary_display != NULL) {
-        free(m_hwc2_primary_display);
-    }
 }
 
 void HwcomposerOutput::updateEnabled(bool enable)

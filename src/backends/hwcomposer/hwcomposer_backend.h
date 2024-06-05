@@ -62,6 +62,7 @@ public:
     void updateDpmsMode(DpmsMode mode);
     void updateEnabled(bool enable);
     bool isEnabled() const;
+    void setStatesInternal();
 Q_SIGNALS:
     void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
 private:
@@ -93,6 +94,7 @@ public:
     HwcomposerWindow *createSurface();
 
     std::unique_ptr<InputBackend> createInputBackend() override;
+    void updateOutputState(hwc2_display_t display);
 
     void enableVSync(bool enable);
     void waitVSync();
@@ -127,8 +129,6 @@ private Q_SLOTS:
 private:
     friend HwcomposerWindow;   
     void setPowerMode(bool enable);
-    bool updateOutputs();
-    void updateOutputsEnabled();  
     void toggleScreenBrightness();
     void initLights();
     Session *m_session;
