@@ -633,6 +633,22 @@ HwcomposerOutput::~HwcomposerOutput()
     }
 }
 
+QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
+{
+    const int height = pixelSize().height();
+    const QMatrix4x4 matrix = Output::logicalToNativeMatrix(rect(), scale(), transform());
+    QVector<EGLint> rects;
+    rects.reserve(region.rectCount() * 4);
+    for (const QRect &_rect : region) {
+        const QRect rect = matrix.mapRect(_rect);
+        rects << rect.left();
+        rects << height - (rect.y() + rect.height());
+        rects << rect.width();
+        rects << rect.height();
+    }
+    return rects;
+}
+
 void HwcomposerOutput::setStatesInternal()
 {
     // Retrieve and set display configuration attributes

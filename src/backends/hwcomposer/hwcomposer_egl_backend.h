@@ -50,8 +50,6 @@ private:
     HwcomposerBackend *m_backend;
     std::unique_ptr<GLFramebuffer> m_framebuffer;
     HwcomposerWindow *m_nativeSurface = nullptr;
-    QRegion m_lastRenderedRegion;
-    DamageJournal m_damageJournal;
     std::unique_ptr<EglHwcomposerOutput> m_output;
 };
 
@@ -62,14 +60,16 @@ public:
     ~EglHwcomposerOutput() override;
 
     std::optional<OutputLayerBeginFrameInfo> beginFrame() override;
+    void aboutToStartPainting(const QRegion &damagedRegion) override;
     bool endFrame(const QRegion &renderedRegion, const QRegion &damagedRegion) override;
     void present();
 
 private:
     HwcomposerOutput *m_hwcomposerOutput;
     EglHwcomposerBackend *m_backend;
-    QRegion m_lastRenderedRegion;
+    QRegion m_currentDamage;
     DamageJournal m_damageJournal;
+    int m_bufferAge = 0;
 };
 
 

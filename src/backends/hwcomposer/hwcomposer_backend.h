@@ -63,6 +63,7 @@ public:
     void updateEnabled(bool enable);
     bool isEnabled() const;
     void setStatesInternal();
+    QVector<int32_t> regionToRects(const QRegion &region) const;
 Q_SIGNALS:
     void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
 private:

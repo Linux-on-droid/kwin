@@ -7,6 +7,7 @@
 #include "basiceglsurfacetexture_internal.h"
 #include "basiceglsurfacetexture_wayland.h"
 #include "openglbackend.h"
+#include "kwineglutils_p.h"
 #include <memory>
 
 namespace KWin
@@ -143,7 +144,10 @@ EglHwcomposerOutput::~EglHwcomposerOutput()
 
 std::optional<OutputLayerBeginFrameInfo> EglHwcomposerOutput::beginFrame()
 {
-    QRegion repair = m_damageJournal.accumulate(0, infiniteRegion());
+    QRegion repair = infiniteRegion();
+    if (m_backend->supportsBufferAge()) {
+        repair = m_damageJournal.accumulate(m_bufferAge, infiniteRegion());
+    }
 
     return OutputLayerBeginFrameInfo{
         .renderTarget = RenderTarget(m_backend->framebuffer()),
@@ -151,18 +155,43 @@ std::optional<OutputLayerBeginFrameInfo> EglHwcomposerOutput::beginFrame()
     };
 }
 
+void EglHwcomposerOutput::aboutToStartPainting(const QRegion &damagedRegion)
+{
+    if (m_backend->surface() && m_bufferAge > 0 && !damagedRegion.isEmpty() && m_backend->supportsPartialUpdate()) {
+        QVector<EGLint> rects = m_hwcomposerOutput->regionToRects(damagedRegion);
+        const bool correct = eglSetDamageRegionKHR(m_backend->eglDisplay(), m_backend->surface(), rects.data(), rects.count() / 4);
+        if (!correct) {
+            qCWarning(KWIN_HWCOMPOSER) << "eglSetDamageRegionKHR failed:" << getEglErrorString();
+        }
+    }
+}
+
 bool EglHwcomposerOutput::endFrame(const QRegion &renderedRegion, const QRegion &damagedRegion)
 {
-    Q_UNUSED(damagedRegion)
-    m_lastRenderedRegion = renderedRegion;
-    glFlush();
+    Q_UNUSED(renderedRegion)
+    m_currentDamage = damagedRegion;
     return true;
 }
 
 void EglHwcomposerOutput::present()
 {
-    eglSwapBuffers(m_backend->eglDisplay(), m_backend->surface());
-    m_damageJournal.add(m_lastRenderedRegion);
+    if (m_backend->supportsSwapBuffersWithDamage() && m_backend->supportsPartialUpdate()) {
+        QVector<EGLint> rects = m_hwcomposerOutput->regionToRects(m_currentDamage);
+        const bool correct = eglSwapBuffersWithDamageKHR(m_backend->eglDisplay(), m_backend->surface(), rects.data(), rects.count() / 4);
+        if (!correct) {
+            qCWarning(KWIN_HWCOMPOSER) << "eglSwapBuffersWithDamageKHR failed:" << getEglErrorString();
+        }
+    } else {
+        const bool correct = eglSwapBuffers(m_backend->eglDisplay(), m_backend->surface());
+        if (!correct) {
+            qCWarning(KWIN_HWCOMPOSER) << "eglSwapBuffers failed:" << getEglErrorString();
+        }
+    }
+
+    if (m_backend->supportsBufferAge()) {
+        eglQuerySurface(m_backend->eglDisplay(), m_backend->surface(), EGL_BUFFER_AGE_EXT, &m_bufferAge);
+    }
+    m_damageJournal.add(m_currentDamage);
 }
 
 } // namespace KWin
