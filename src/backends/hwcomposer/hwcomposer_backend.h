@@ -34,7 +34,6 @@
 typedef struct hwc_display_contents_1 hwc_display_contents_1_t;
 typedef struct hwc_layer_1 hwc_layer_1_t;
 typedef struct hwc_composer_device_1 hwc_composer_device_1_t;
-struct light_device_t;
 
 class HWComposerNativeWindowBuffer;
 
@@ -131,9 +130,7 @@ private:
     friend HwcomposerWindow;   
     void setPowerMode(bool enable);
     void toggleScreenBrightness();
-    void initLights();
     Session *m_session;
-    light_device_t *m_lights = nullptr;
     int m_vsyncInterval = 16;
     bool m_hasVsync = false;
     QMutex m_vsyncMutex;
