@@ -351,7 +351,6 @@ void HwcomposerBackend::wakeVSync()
 HwcomposerWindow::HwcomposerWindow(HwcomposerBackend *backend)
     : HWComposerNativeWindow( backend->size().width(),  backend->size().height(), HAL_PIXEL_FORMAT_RGBA_8888), m_backend(backend)
 {
-    setBufferCount(3);
     m_hwc2_primary_display = m_backend->hwc2_display();
     hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_hwc2_primary_display);
     hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
