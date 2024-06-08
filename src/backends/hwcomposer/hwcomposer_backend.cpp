@@ -250,11 +250,6 @@ void HwcomposerBackend::RegisterCallbacks()
 
 bool HwcomposerBackend::initialize()
 {
-    hw_module_t *hwcModule = nullptr;
-    if (hw_get_module(HWC_HARDWARE_MODULE_ID, (const hw_module_t **)&hwcModule) != 0) {
-        qCWarning(KWIN_HWCOMPOSER) << "Failed to get hwcomposer module";
-        return false;
-    }
     m_hwc2device = hwc2_compat_device_new(false);
 
     RegisterCallbacks();
