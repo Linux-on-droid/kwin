@@ -109,6 +109,7 @@ bool EglHwcomposerBackend::initRenderingContext()
 void EglHwcomposerBackend::present(Output *output)
 {
     m_output->present();
+    static_cast<HwcomposerOutput *>(output)->notifyFrame();
 }
 
 std::unique_ptr<SurfaceTexture> EglHwcomposerBackend::createSurfaceTextureInternal(SurfacePixmapInternal *pixmap)

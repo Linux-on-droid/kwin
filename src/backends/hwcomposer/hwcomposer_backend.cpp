@@ -466,27 +466,41 @@ QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
     return rects;
 }
 
-void HwcomposerOutput::compositing(int flags, qint64 timestamp)
+void HwcomposerOutput::compositing(int flags)
 {
     m_compositingSemaphore.release();
     if (flags > 0) {
         RenderLoopPrivate *renderLoopPrivate = RenderLoopPrivate::get(m_renderLoop.get());
         if (renderLoopPrivate->pendingFrameCount > 0) {
-            std::chrono::nanoseconds ntimestamp(timestamp);
-            renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+            qint64 now = std::chrono::steady_clock::now().time_since_epoch().count();
+            qint64 next_vsync = m_vsync_last_timestamp + m_vsyncPeriod;
+
+            if ((next_vsync - now) <= m_idle_time) {
+                // Too close! Sad
+                std::chrono::nanoseconds ntimestamp(next_vsync + m_vsyncPeriod - m_idle_time);
+                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+            } else {
+                // We can go ahead
+                std::chrono::nanoseconds ntimestamp(next_vsync - m_idle_time);
+                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+            }
         }
     }
     m_compositingSemaphore.acquire();
 }
 
-void HwcomposerOutput::handleVSync(int64_t timestamp)
+void HwcomposerOutput::notifyFrame()
 {
     int flags = 1;
     if (m_compositingSemaphore.available() > 0) {
         flags = 0;
     }
-    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection,
-                              Q_ARG(int, flags), Q_ARG(qint64, timestamp));
+    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection, Q_ARG(int, flags));
+}
+
+void HwcomposerOutput::handleVSync(int64_t timestamp)
+{
+    m_vsync_last_timestamp = timestamp;
 }
 
 void HwcomposerOutput::setStatesInternal()
@@ -499,7 +513,8 @@ void HwcomposerOutput::setStatesInternal()
     int32_t height = config->height;
     int32_t dpiX = config->dpiX;
     int32_t dpiY = config->dpiY;
-    int32_t vsyncPeriod = config->vsyncPeriod;
+    m_vsyncPeriod = (config->vsyncPeriod == 0) ? 16666667 : config->vsyncPeriod;
+    m_idle_time = 2 * 1000000;
 
     // Override with debug environment variables if they exist
     QString debugWidth = qgetenv("KWIN_DEBUG_WIDTH");
@@ -539,7 +554,7 @@ void HwcomposerOutput::setStatesInternal()
         scale = std::min(pixelSize.width() / 96.0, pixelSize.height() / 96.0);
     }
 
-    m_renderLoop->setRefreshRate((vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod);
+    m_renderLoop->setRefreshRate(10E11 / m_vsyncPeriod);
 
     QList<std::shared_ptr<OutputMode>> modes;
     OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;

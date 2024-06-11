@@ -62,12 +62,13 @@ public:
     void updateEnabled(bool enable);
     bool isEnabled() const;
     void setStatesInternal();
+    void notifyFrame();
     void handleVSync(int64_t timestamp);
     QVector<int32_t> regionToRects(const QRegion &region) const;
 Q_SIGNALS:
     void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
 private Q_SLOTS:
-    void compositing(int flags, qint64 timestamp);
+    void compositing(int flags);
 
 private:
     friend class HwcomposerBackend;
@@ -75,6 +76,9 @@ private:
     QSize m_pixelSize;
     bool m_isEnabled = true;
     QSemaphore m_compositingSemaphore;
+    qint64 m_vsyncPeriod;
+    qint64 m_idle_time;
+    qint64 m_vsync_last_timestamp;
 
     HwcomposerBackend *m_backend;
     hwc2_compat_display_t *m_hwc2_primary_display;
