@@ -48,14 +48,10 @@ class HwcomposerOutput : public Output
 {
     Q_OBJECT
 public:
-    HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t* hwc2_primary_display);
+    HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t* display);
     ~HwcomposerOutput() override;
 
-    void init();
-
     RenderLoop *renderLoop() const override;
-    bool isValid() const;
-    bool hardwareTransforms() const;
     void setDpmsMode(DpmsMode mode) override;
     void updateDpmsMode(DpmsMode mode);
     void updateEnabled(bool enable);
@@ -80,7 +76,7 @@ private:
     qint64 m_vsync_last_timestamp;
 
     HwcomposerBackend *m_backend;
-    hwc2_compat_display_t *m_hwc2_primary_display;
+    hwc2_compat_display_t *m_display;
 };
 
 class KWIN_EXPORT HwcomposerBackend : public OutputBackend
@@ -90,23 +86,20 @@ public:
     explicit HwcomposerBackend(Session *session, QObject *parent = nullptr);
     virtual ~HwcomposerBackend();
 
-    Session *session() const;
     bool initialize() override;
     std::unique_ptr<OpenGLBackend> createOpenGLBackend() override;
+    std::unique_ptr<InputBackend> createInputBackend() override;
 
     Outputs outputs() const override;
 
+    //TODO: Move to outputs
     QSize size() const;
-
-    int scale() const;
-
     HwcomposerWindow *createSurface();
-
-    std::unique_ptr<InputBackend> createInputBackend() override;
-    void updateOutputState(hwc2_display_t display);
-
     void enableVSync(bool enable);
+
+    void updateOutputState(hwc2_display_t display);
     void wakeVSync(hwc2_display_t display, int64_t timestamp);
+
     QVector<CompositingType> supportedCompositors() const override {
         return QVector<CompositingType>{OpenGLCompositing};
     }
@@ -119,6 +112,7 @@ public:
         return m_hwc2device;
     }
 
+    //TODO: Move to outputs
     hwc2_compat_display_t *hwc2_display() const {
         return m_hwc2_primary_display;
     }
@@ -128,24 +122,21 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void toggleBlankOutput();
-    void screenBrightnessChanged(int brightness) {
-        m_oldScreenBrightness = brightness;
-    }
 
 private:
-    friend HwcomposerWindow;   
-    void setPowerMode(bool enable);
-    void toggleScreenBrightness();
+    friend HwcomposerWindow;
     Session *m_session;
-    bool m_hasVsync = false;
-    std::unique_ptr<HwcomposerOutput> m_output;
-    bool m_outputBlank = true;    
-    int m_oldScreenBrightness = 0x7f;
 
     void RegisterCallbacks();
 
+    //TODO: Change to outputs
+    std::unique_ptr<HwcomposerOutput> m_output;
+    //TODO: Move to outputs
+    bool m_hasVsync = false;
+    bool m_outputBlank = true;
+    hwc2_compat_display_t *m_hwc2_primary_display = nullptr;
+
     hwc2_compat_device_t *m_hwc2device = nullptr;
-    hwc2_compat_display_t* m_hwc2_primary_display = nullptr;
 };
 
 class HwcomposerWindow : public HWComposerNativeWindow
@@ -160,7 +151,7 @@ private:
     HwcomposerBackend *m_backend;
     int lastPresentFence = -1;
 
-    hwc2_compat_display_t *m_hwc2_primary_display = nullptr;
+    hwc2_compat_display_t *m_display = nullptr;
 };
 
 }

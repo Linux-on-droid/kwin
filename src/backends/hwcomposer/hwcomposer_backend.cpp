@@ -54,11 +54,6 @@ HwcomposerBackend::HwcomposerBackend(Session *session, QObject *parent)
 {
 }
 
-Session *HwcomposerBackend::session() const
-{
-    return m_session;
-}
-
 HwcomposerBackend::~HwcomposerBackend()
 {
     if (sceneEglDisplay() != EGL_NO_DISPLAY) {
@@ -141,7 +136,7 @@ bool HwcomposerBackend::initialize()
 
     // get display configuration
     m_output.reset(new HwcomposerOutput(this, m_hwc2_primary_display));
-    if (!m_output->isValid()) {
+    if (!m_output->isEnabled()) {
         return false;
     }
 
@@ -173,14 +168,6 @@ QSize HwcomposerBackend::size() const
         return m_output->pixelSize();
     }
     return QSize();
-}
-
-int HwcomposerBackend::scale() const
-{
-    if (m_output) {
-        return m_output->scale();
-    }
-    return 1;
 }
 
 void HwcomposerBackend::enableVSync(bool enable)
@@ -220,8 +207,8 @@ void HwcomposerBackend::wakeVSync(hwc2_display_t display, int64_t timestamp)
 HwcomposerWindow::HwcomposerWindow(HwcomposerBackend *backend)
     : HWComposerNativeWindow( backend->size().width(),  backend->size().height(), HAL_PIXEL_FORMAT_RGBA_8888), m_backend(backend)
 {
-    m_hwc2_primary_display = m_backend->hwc2_display();
-    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_hwc2_primary_display);
+    m_display = m_backend->hwc2_display();
+    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_display);
     hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
     hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
 
@@ -253,7 +240,7 @@ void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
         acquireFenceFd = -1;
     }
 
-    error = hwc2_compat_display_validate(m_hwc2_primary_display, &numTypes, &numRequests);
+    error = hwc2_compat_display_validate(m_display, &numTypes, &numRequests);
     if (error != HWC2_ERROR_NONE && error != HWC2_ERROR_HAS_CHANGES) {
         qDebug("prepare: validate failed for display %d: %d", displayId, error);
         return;
@@ -264,18 +251,18 @@ void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
         return;
     }
 
-    error = hwc2_compat_display_accept_changes(m_hwc2_primary_display);
+    error = hwc2_compat_display_accept_changes(m_display);
     if (error != HWC2_ERROR_NONE) {
         qDebug("prepare: acceptChanges failed: %d", error);
         return;
     }
 
-    hwc2_compat_display_set_client_target(m_hwc2_primary_display, /* slot */ 0, buffer,
+    hwc2_compat_display_set_client_target(m_display, /* slot */ 0, buffer,
                                             acquireFenceFd,
                                             HAL_DATASPACE_UNKNOWN);
 
     int presentFence = -1;
-    hwc2_compat_display_present(m_hwc2_primary_display, &presentFence);
+    hwc2_compat_display_present(m_display, &presentFence);
 
 
     if (lastPresentFence != -1) {
@@ -288,19 +275,14 @@ void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
     HWCNativeBufferSetFence(buffer, presentFence);
 }
 
-bool HwcomposerOutput::hardwareTransforms() const
-{
-    return false;
-}
-
-HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *hwc2_primary_display)
+HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *display)
     : Output(backend)
     , m_renderLoop(std::make_unique<RenderLoop>())
     , m_backend(backend)
-    , m_hwc2_primary_display(hwc2_primary_display)
+    , m_display(display)
 {
 
-    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_hwc2_primary_display);
+    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_display);
     Q_ASSERT(config);
 
     int32_t width = config->width;
@@ -345,8 +327,8 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
 
 HwcomposerOutput::~HwcomposerOutput()
 {
-    if (m_hwc2_primary_display != NULL) {
-        free(m_hwc2_primary_display);
+    if (m_display != NULL) {
+        free(m_display);
     }
 }
 
@@ -406,7 +388,7 @@ void HwcomposerOutput::handleVSync(int64_t timestamp)
 void HwcomposerOutput::setStatesInternal()
 {
     // Retrieve and set display configuration attributes
-    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_hwc2_primary_display);
+    HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_display);
     Q_ASSERT(config);
 
     int32_t width = config->width;
@@ -481,11 +463,6 @@ bool HwcomposerOutput::isEnabled() const
 RenderLoop *HwcomposerOutput::renderLoop() const
 {
     return m_renderLoop.get();
-}
-
-bool HwcomposerOutput::isValid() const
-{
-    return isEnabled();
 }
 
 void HwcomposerOutput::setDpmsMode(DpmsMode mode)
