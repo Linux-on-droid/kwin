@@ -194,7 +194,7 @@ typedef struct : public HWC2EventListener
 void hwc2_callback_vsync(HWC2EventListener *listener, int32_t sequenceId,
                          hwc2_display_t display, int64_t timestamp)
 {
-    static_cast<const HwcProcs_v20 *>(listener)->backend->wakeVSync();
+    static_cast<const HwcProcs_v20 *>(listener)->backend->wakeVSync(display, timestamp);
 }
 
 void hwc2_callback_hotplug(HWC2EventListener *listener, int32_t sequenceId,
@@ -243,10 +243,6 @@ bool HwcomposerBackend::initialize()
     m_output.reset(new HwcomposerOutput(this, m_hwc2_primary_display));
     if (!m_output->isValid()) {
         return false;
-    }
-
-    if (m_output->refreshRate() != 0) {
-        m_vsyncInterval = 1000000/m_output->refreshRate();
     }
 
     m_output->updateDpmsMode(HwcomposerOutput::DpmsMode::On);
@@ -314,38 +310,11 @@ std::unique_ptr<OpenGLBackend> HwcomposerBackend::createOpenGLBackend()
     return std::make_unique<EglHwcomposerBackend>(this);
 }
 
-void HwcomposerBackend::waitVSync()
+void HwcomposerBackend::wakeVSync(hwc2_display_t display, int64_t timestamp)
 {
-    if (!m_hasVsync) {
-        return;
+    if (m_output != nullptr) {
+        m_output.get()->handleVSync(timestamp);
     }
-    m_vsyncMutex.lock();
-    m_vsyncWaitCondition.wait(&m_vsyncMutex, m_vsyncInterval);
-    m_vsyncMutex.unlock();
-}
-
-void HwcomposerBackend::compositing(int flags)
-{
-    m_compositingSemaphore.release();
-    if(flags > 0){
-        RenderLoopPrivate *renderLoopPrivate = RenderLoopPrivate::get(m_output->renderLoop());
-        if(renderLoopPrivate->pendingFrameCount > 0){
-            renderLoopPrivate->notifyFrameCompleted(std::chrono::steady_clock::now().time_since_epoch());
-        }
-    }
-    m_compositingSemaphore.acquire();
-}
-
-void HwcomposerBackend::wakeVSync()
-{
-    int flags = 1;
-    if (m_compositingSemaphore.available() > 0) {
-        flags = 0;
-    }
-    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection, Q_ARG(int, flags));
-    m_vsyncMutex.lock();
-    m_vsyncWaitCondition.wakeAll();
-    m_vsyncMutex.unlock();
 }
 
 HwcomposerWindow::HwcomposerWindow(HwcomposerBackend *backend)
@@ -427,8 +396,8 @@ bool HwcomposerOutput::hardwareTransforms() const
 HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *hwc2_primary_display)
     : Output(backend)
     , m_renderLoop(std::make_unique<RenderLoop>())
-    , m_hwc2_primary_display(hwc2_primary_display)
     , m_backend(backend)
+    , m_hwc2_primary_display(hwc2_primary_display)
 {
 
     HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_hwc2_primary_display);
@@ -497,6 +466,29 @@ QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
     return rects;
 }
 
+void HwcomposerOutput::compositing(int flags, qint64 timestamp)
+{
+    m_compositingSemaphore.release();
+    if (flags > 0) {
+        RenderLoopPrivate *renderLoopPrivate = RenderLoopPrivate::get(m_renderLoop.get());
+        if (renderLoopPrivate->pendingFrameCount > 0) {
+            std::chrono::nanoseconds ntimestamp(timestamp);
+            renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+        }
+    }
+    m_compositingSemaphore.acquire();
+}
+
+void HwcomposerOutput::handleVSync(int64_t timestamp)
+{
+    int flags = 1;
+    if (m_compositingSemaphore.available() > 0) {
+        flags = 0;
+    }
+    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection,
+                              Q_ARG(int, flags), Q_ARG(qint64, timestamp));
+}
+
 void HwcomposerOutput::setStatesInternal()
 {
     // Retrieve and set display configuration attributes
@@ -507,7 +499,7 @@ void HwcomposerOutput::setStatesInternal()
     int32_t height = config->height;
     int32_t dpiX = config->dpiX;
     int32_t dpiY = config->dpiY;
-    int32_t vsyncPeriod = (width == 2072) ? 20000000 : config->vsyncPeriod;
+    int32_t vsyncPeriod = config->vsyncPeriod;
 
     // Override with debug environment variables if they exist
     QString debugWidth = qgetenv("KWIN_DEBUG_WIDTH");
@@ -547,9 +539,11 @@ void HwcomposerOutput::setStatesInternal()
         scale = std::min(pixelSize.width() / 96.0, pixelSize.height() / 96.0);
     }
 
+    m_renderLoop->setRefreshRate((vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod);
+
     QList<std::shared_ptr<OutputMode>> modes;
     OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;
-    std::shared_ptr<OutputMode> mode = std::make_shared<OutputMode>(pixelSize, (vsyncPeriod == 0) ? 60000 : 10E11 / vsyncPeriod, modeFlags);
+    std::shared_ptr<OutputMode> mode = std::make_shared<OutputMode>(pixelSize, m_renderLoop->refreshRate(), modeFlags);
     modes << mode;
     State initialState;
     initialState.modes = modes;

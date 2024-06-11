@@ -62,16 +62,22 @@ public:
     void updateEnabled(bool enable);
     bool isEnabled() const;
     void setStatesInternal();
+    void handleVSync(int64_t timestamp);
     QVector<int32_t> regionToRects(const QRegion &region) const;
 Q_SIGNALS:
     void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
+private Q_SLOTS:
+    void compositing(int flags, qint64 timestamp);
+
 private:
-    QSize m_pixelSize;
-    hwc2_compat_display_t *m_hwc2_primary_display;
     friend class HwcomposerBackend;
     std::unique_ptr<RenderLoop> m_renderLoop;
-    HwcomposerBackend *m_backend;
+    QSize m_pixelSize;
     bool m_isEnabled = true;
+    QSemaphore m_compositingSemaphore;
+
+    HwcomposerBackend *m_backend;
+    hwc2_compat_display_t *m_hwc2_primary_display;
 };
 
 class KWIN_EXPORT HwcomposerBackend : public OutputBackend
@@ -97,8 +103,7 @@ public:
     void updateOutputState(hwc2_display_t display);
 
     void enableVSync(bool enable);
-    void waitVSync();
-    void wakeVSync();
+    void wakeVSync(hwc2_display_t display, int64_t timestamp);
     QVector<CompositingType> supportedCompositors() const override {
         return QVector<CompositingType>{OpenGLCompositing};
     }
@@ -124,18 +129,12 @@ private Q_SLOTS:
         m_oldScreenBrightness = brightness;
     }
 
-    void compositing(int flags);
-
 private:
     friend HwcomposerWindow;   
     void setPowerMode(bool enable);
     void toggleScreenBrightness();
     Session *m_session;
-    int m_vsyncInterval = 16;
     bool m_hasVsync = false;
-    QMutex m_vsyncMutex;
-    QWaitCondition m_vsyncWaitCondition;
-    QSemaphore     m_compositingSemaphore;
     std::unique_ptr<BacklightInputEventFilter> m_filter;
     std::unique_ptr<HwcomposerOutput> m_output;
     bool m_outputBlank = true;    
