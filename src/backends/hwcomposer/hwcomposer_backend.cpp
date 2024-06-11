@@ -384,7 +384,6 @@ void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
         acquireFenceFd = -1;
     }
 
-    hwc2_compat_display_set_power_mode(m_hwc2_primary_display, HWC2_POWER_MODE_ON);
     error = hwc2_compat_display_validate(m_hwc2_primary_display, &numTypes, &numRequests);
     if (error != HWC2_ERROR_NONE && error != HWC2_ERROR_HAS_CHANGES) {
         qDebug("prepare: validate failed for display %d: %d", displayId, error);
