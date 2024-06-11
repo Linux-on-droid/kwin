@@ -7,4 +7,4 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 #include "hwcomposer_logging.h"
-Q_LOGGING_CATEGORY(KWIN_HWCOMPOSER, "kwin_wayland_hwcomposer", QtCriticalMsg)
+Q_LOGGING_CATEGORY(KWIN_HWCOMPOSER, "kwin_wayland_hwcomposer", QtWarningMsg)
