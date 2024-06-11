@@ -42,7 +42,6 @@ namespace KWin
 
 class HwcomposerWindow;
 class HwcomposerBackend;
-class BacklightInputEventFilter;
 
 
 class HwcomposerOutput : public Output
@@ -139,7 +138,6 @@ private:
     void toggleScreenBrightness();
     Session *m_session;
     bool m_hasVsync = false;
-    std::unique_ptr<BacklightInputEventFilter> m_filter;
     std::unique_ptr<HwcomposerOutput> m_output;
     bool m_outputBlank = true;    
     int m_oldScreenBrightness = 0x7f;
@@ -163,26 +161,6 @@ private:
     int lastPresentFence = -1;
 
     hwc2_compat_display_t *m_hwc2_primary_display = nullptr;
-};
-
-class BacklightInputEventFilter : public QObject,  public InputEventFilter
-{
-public:
-    BacklightInputEventFilter(HwcomposerBackend *backend);
-    virtual ~BacklightInputEventFilter();
-
-    bool pointerEvent(QMouseEvent *event, quint32 nativeButton);
-    bool wheelEvent(QWheelEvent *event);
-    bool keyEvent(QKeyEvent *event);
-    bool touchDown(qint32 id, const QPointF &pos, quint32 time);
-    bool touchMotion(qint32 id, const QPointF &pos, quint32 time);
-    bool touchUp(qint32 id, quint32 time);
-private:
-    void toggleBacklight();
-    HwcomposerBackend *m_backend;
-    QElapsedTimer m_doubleTapTimer;
-    QVector<qint32> m_touchPoints;
-    bool m_secondTap = false;
 };
 
 }
