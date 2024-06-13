@@ -332,6 +332,11 @@ HwcomposerOutput::~HwcomposerOutput()
     }
 }
 
+HwcomposerWindow *HwcomposerOutput::createSurface()
+{
+    return m_backend->createSurface();
+}
+
 QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
 {
     const int height = pixelSize().height();

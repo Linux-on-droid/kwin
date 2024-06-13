@@ -59,7 +59,10 @@ public:
     void setStatesInternal();
     void notifyFrame();
     void handleVSync(int64_t timestamp);
+
     QVector<int32_t> regionToRects(const QRegion &region) const;
+    HwcomposerWindow *createSurface();
+
 Q_SIGNALS:
     void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
 private Q_SLOTS:

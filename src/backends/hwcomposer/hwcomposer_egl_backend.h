@@ -7,8 +7,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#ifndef KWIN_EGL_HWCOMPOSER_BACKEND_H
-#define KWIN_EGL_HWCOMPOSER_BACKEND_H
+#pragma once
 
 #include "abstract_egl_backend.h"
 #include "core/outputlayer.h"
@@ -39,18 +38,15 @@ public:
     void init() override;
     void present(Output *output) override;
 
-    GLFramebuffer* framebuffer() const { return m_framebuffer.get(); }
-
 private:
     bool initializeEgl();
-    bool initRenderingContext();
     bool initBufferConfigs();
-    bool makeContextCurrent();
+    bool initRenderingContext();
+    bool createEglHwcomposerOutput(Output *output);
+    void cleanupSurfaces() override;
 
     HwcomposerBackend *m_backend;
-    std::unique_ptr<GLFramebuffer> m_framebuffer;
-    HwcomposerWindow *m_nativeSurface = nullptr;
-    std::unique_ptr<EglHwcomposerOutput> m_output;
+    std::map<Output *, std::unique_ptr<EglHwcomposerOutput>> m_outputs;
 };
 
 class EglHwcomposerOutput : public OutputLayer
@@ -64,15 +60,27 @@ public:
     bool endFrame(const QRegion &renderedRegion, const QRegion &damagedRegion) override;
     void present();
 
+    EGLSurface surface() const
+    {
+        return m_surface;
+    }
+    GLFramebuffer *framebuffer() const
+    {
+        return m_framebuffer.get();
+    }
+
 private:
-    HwcomposerOutput *m_hwcomposerOutput;
-    EglHwcomposerBackend *m_backend;
+    bool makeContextCurrent() const;
+
+    HwcomposerWindow *m_nativeSurface = nullptr;
+    EGLSurface m_surface = EGL_NO_SURFACE;
+    std::unique_ptr<GLFramebuffer> m_framebuffer;
     QRegion m_currentDamage;
     DamageJournal m_damageJournal;
     int m_bufferAge = 0;
+
+    HwcomposerOutput *m_output;
+    EglHwcomposerBackend *m_backend;
 };
 
-
 } // namespace KWin
-
-#endif // KWIN_EGL_HWCOMPOSER_BACKEND_H
