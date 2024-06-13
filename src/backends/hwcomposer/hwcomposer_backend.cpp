@@ -8,43 +8,18 @@
 */
 #include "hwcomposer_backend.h"
 
-#include "composite.h"
 #include "hwcomposer_egl_backend.h"
 #include "hwcomposer_logging.h"
-#include "main.h"
-#include "scene/workspacescene.h"
-#include "backends/libinput/libinputbackend.h"
-//#include "screens_hwcomposer.h"
-#include "wayland_server.h"
-// KWayland
-#include "wayland/output_interface.h"
-#include "wayland/seat_interface.h"
-// KDE
-#include <KConfigGroup>
-// Qt
+
 #include <QDBusConnection>
-#include <QKeyEvent>
-// hybris/android
-#include <android-config.h>
-#include <hardware/hardware.h>
-#include <hardware/lights.h>
-#include <hybris/hwc2/hwc2_compatibility_layer.h>
-#include <hybris/hwcomposerwindow/hwcomposer.h>
-// linux
-#include <linux/input.h>
+#include <QDBusError>
+#include <QDBusMessage>
+#include <QtConcurrent>
+
 #include <sync/sync.h>
 
-#include <QDBusError>
-#include <QtConcurrent>
-#include <QDBusMessage>
 #include "core/renderloop_p.h"
-#include "composite.h"
-// based on test_hwcomposer.c from libhybris project (Apache 2 licensed)
 
-#include "core/output.h"
-#include "core/outputconfiguration.h"
-
-using namespace KWaylandServer;
 
 namespace KWin {
 
@@ -70,15 +45,6 @@ void HwcomposerBackend::toggleBlankOutput()
     enableVSync(!m_outputBlank);
 
     hwc2_compat_display_set_power_mode(m_hwc2_primary_display, m_outputBlank ? HWC2_POWER_MODE_OFF : HWC2_POWER_MODE_ON);
-
-    // enable/disable compositor repainting when blanked
-    if (m_output != nullptr) m_output.get()->updateEnabled(!m_outputBlank);
-    if (Compositor *compositor = Compositor::self()) {
-        if (!m_outputBlank) {
-            compositor->scene()->addRepaintFull();
-        }
-    }
-    Q_EMIT outputBlankChanged();
 }
 
 typedef struct : public HWC2EventListener

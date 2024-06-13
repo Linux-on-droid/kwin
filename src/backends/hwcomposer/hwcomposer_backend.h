@@ -6,29 +6,20 @@
 
     SPDX-License-Identifier: GPL-3.0-or-later
 */
-#ifndef KWIN_HWCOMPOSER_BACKEND_H
-#define KWIN_HWCOMPOSER_BACKEND_H
-#include "core/outputbackend.h"
-#include "core/output.h"
-#include "input.h"
-#include "backends/libinput/libinputbackend.h"
 
-#include <QElapsedTimer>
-#include <QMutex>
-#include <QWaitCondition>
+#pragma once
+
+#include "backends/libinput/libinputbackend.h"
+#include "core/output.h"
+#include "core/outputbackend.h"
+#include "core/renderloop.h"
+
 #include <QSemaphore>
-#include <QFile>
-// libhybris
+
 #include <hardware/hwcomposer.h>
 #include <hwcomposer_window.h>
 #include <hybris/hwc2/hwc2_compatibility_layer.h>
 #include <hybris/hwcomposerwindow/hwcomposer.h>
-#include <QBasicTimer>
-
-// needed as hwcomposer_window.h includes EGL which on non-arm includes Xlib
-#include <fixx11h.h>
-#include "core/renderloop.h"
-#include "wayland/output_interface.h"
 
 
 typedef struct hwc_display_contents_1 hwc_display_contents_1_t;
@@ -39,10 +30,8 @@ class HWComposerNativeWindowBuffer;
 
 namespace KWin
 {
-
 class HwcomposerWindow;
 class HwcomposerBackend;
-
 
 class HwcomposerOutput : public Output
 {
@@ -120,9 +109,6 @@ public:
         return m_hwc2_primary_display;
     }
 
-Q_SIGNALS:
-    void outputBlankChanged();
-
 private Q_SLOTS:
     void toggleBlankOutput();
 
@@ -158,5 +144,3 @@ private:
 };
 
 }
-
-#endif
