@@ -6,8 +6,8 @@
 
     SPDX-License-Identifier: GPL-3.0-or-later
 */
-#include "hwcomposer_backend.h"
 
+#include "hwcomposer_backend.h"
 #include "hwcomposer_egl_backend.h"
 #include "hwcomposer_logging.h"
 
@@ -36,17 +36,6 @@ HwcomposerBackend::~HwcomposerBackend()
     }
 }
 
-void HwcomposerBackend::toggleBlankOutput()
-{
-    if (!m_hwc2device) {
-        return;
-    }
-    m_outputBlank = !m_outputBlank;
-    enableVSync(!m_outputBlank);
-
-    hwc2_compat_display_set_power_mode(m_hwc2_primary_display, m_outputBlank ? HWC2_POWER_MODE_OFF : HWC2_POWER_MODE_ON);
-}
-
 typedef struct : public HWC2EventListener
 {
     HwcomposerBackend *backend = nullptr;
@@ -63,6 +52,8 @@ void hwc2_callback_hotplug(HWC2EventListener *listener, int32_t sequenceId,
                            bool primaryDisplay)
 {
     hwc2_compat_device_on_hotplug(static_cast<const HwcProcs_v20 *>(listener)->backend->hwc2_device(), display, connected);
+
+    static_cast<const HwcProcs_v20 *>(listener)->backend->handleHotplug(display, connected, primaryDisplay);
 }
 
 void hwc2_callback_refresh(HWC2EventListener *listener, int32_t sequenceId,
@@ -84,6 +75,14 @@ void HwcomposerBackend::RegisterCallbacks()
     hwc2_compat_device_register_callback(m_hwc2device, procs, composerSequenceId++);
 }
 
+void HwcomposerBackend::createOutput(hwc2_display_t display)
+{
+    m_outputs[display] = std::make_unique<HwcomposerOutput>(this, display);
+    m_outputs[display]->toggleBlankOutput();
+
+    Q_EMIT outputAdded(m_outputs[display].get());
+}
+
 bool HwcomposerBackend::initialize()
 {
     m_hwc2device = hwc2_compat_device_new(false);
@@ -91,71 +90,12 @@ bool HwcomposerBackend::initialize()
     RegisterCallbacks();
     for (int i = 0; i < 5 * 1000; ++i) {
         // Wait at most 5s for hotplug events
-        if ((m_hwc2_primary_display =
-                hwc2_compat_device_get_display_by_id(m_hwc2device, 0)))
+        if (hwc2_compat_device_get_display_by_id(m_hwc2device, 0))
         break;
         usleep(1000);
     }
 
-    //move to HwcomposerOutput + signal
-    toggleBlankOutput();
-
-    // get display configuration
-    m_output.reset(new HwcomposerOutput(this, m_hwc2_primary_display));
-    if (!m_output->isEnabled()) {
-        return false;
-    }
-
-    m_output->updateDpmsMode(HwcomposerOutput::DpmsMode::On);
-
-    Q_EMIT outputAdded(m_output.get());
-    m_output.get()->updateEnabled(true);
-
-    Q_EMIT outputsQueried();
-
     return true;
-}
-
-void HwcomposerBackend::updateOutputState(hwc2_display_t display) {
-    if (m_output != nullptr) {
-        m_output.get()->setStatesInternal();
-        Q_EMIT outputsQueried();
-    }
-}
-
-std::unique_ptr<InputBackend>HwcomposerBackend::createInputBackend()
-{
-    return std::make_unique<LibinputBackend>(m_session);
-}
-
-QSize HwcomposerBackend::size() const
-{
-    if (m_output) {
-        return m_output->pixelSize();
-    }
-    return QSize();
-}
-
-void HwcomposerBackend::enableVSync(bool enable)
-{
-    if (m_hasVsync == enable) {
-        return;
-    }
-    hwc2_compat_display_set_vsync_enabled(m_hwc2_primary_display, enable ? HWC2_VSYNC_ENABLE : HWC2_VSYNC_DISABLE);
-    m_hasVsync = enable;
-}
-
-HwcomposerWindow *HwcomposerBackend::createSurface()
-{
-    return new HwcomposerWindow(this);
-}
-
-Outputs HwcomposerBackend::outputs() const
-{
-    if (m_output != nullptr) {
-        return QVector<HwcomposerOutput *>({m_output.get()});
-    }
-    return {};
 }
 
 std::unique_ptr<OpenGLBackend> HwcomposerBackend::createOpenGLBackend()
@@ -163,90 +103,57 @@ std::unique_ptr<OpenGLBackend> HwcomposerBackend::createOpenGLBackend()
     return std::make_unique<EglHwcomposerBackend>(this);
 }
 
+std::unique_ptr<InputBackend>HwcomposerBackend::createInputBackend()
+{
+    return std::make_unique<LibinputBackend>(m_session);
+}
+
+Outputs HwcomposerBackend::outputs() const
+{
+    QVector<HwcomposerOutput *> outputs;
+
+    for (const auto &out : m_outputs)
+        outputs.push_back(out.second.get());
+    return outputs;
+}
+
 void HwcomposerBackend::wakeVSync(hwc2_display_t display, int64_t timestamp)
 {
-    if (m_output != nullptr) {
-        m_output.get()->handleVSync(timestamp);
-    }
+    if (m_outputs.find(display) != m_outputs.end())
+        m_outputs[display]->handleVSync(timestamp);
 }
 
-HwcomposerWindow::HwcomposerWindow(HwcomposerBackend *backend)
-    : HWComposerNativeWindow( backend->size().width(),  backend->size().height(), HAL_PIXEL_FORMAT_RGBA_8888), m_backend(backend)
+void HwcomposerBackend::handleHotplug(hwc2_display_t display, bool connected, bool primaryDisplay)
 {
-    m_display = m_backend->hwc2_display();
-    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_display);
-    hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
-    hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
-
-    hwc2_compat_layer_set_source_crop(layer, 0.0f, 0.0f, m_backend->size().width(), m_backend->size().height());
-    hwc2_compat_layer_set_display_frame(layer, 0, 0, m_backend->size().width(), m_backend->size().height());
-    hwc2_compat_layer_set_visible_region(layer, 0, 0, m_backend->size().width(), m_backend->size().height());
+    qCInfo(KWIN_HWCOMPOSER) << "Hotplug Display: " << display << ", connected: " << connected << ", isPrimary: " << primaryDisplay;
+    if (connected) {
+        if (m_outputs.find(display) == m_outputs.end()) {
+            createOutput(display);
+            m_outputs[display]->updateEnabled(true);
+        }
+    } else {
+        if (m_outputs.find(display) != m_outputs.end()) {
+            m_outputs[display]->updateEnabled(false);
+            Q_EMIT outputRemoved(m_outputs[display].get());
+            m_outputs.erase(display);
+        }
+    }
+    Q_EMIT outputsQueried();
 }
 
-HwcomposerWindow::~HwcomposerWindow()
+void HwcomposerBackend::updateOutputState(hwc2_display_t display)
 {
-    if (lastPresentFence != -1) {
-        close(lastPresentFence);
-    }
+    m_outputs[display]->resetStates();
+    Q_EMIT outputsQueried();
 }
 
-void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
-{
-    uint32_t numTypes = 0;
-    uint32_t numRequests = 0;
-    int displayId = 0;
-    hwc2_error_t error = HWC2_ERROR_NONE;
-
-    int acquireFenceFd = HWCNativeBufferGetFence(buffer);
-    int syncBeforeSet = 1;
-
-    if (syncBeforeSet && acquireFenceFd >= 0) {
-        sync_wait(acquireFenceFd, -1);
-        close(acquireFenceFd);
-        acquireFenceFd = -1;
-    }
-
-    error = hwc2_compat_display_validate(m_display, &numTypes, &numRequests);
-    if (error != HWC2_ERROR_NONE && error != HWC2_ERROR_HAS_CHANGES) {
-        qDebug("prepare: validate failed for display %d: %d", displayId, error);
-        return;
-    }
-
-    if (numTypes || numRequests) {
-        qDebug("prepare: validate required changes for display %d: %d",displayId, error);
-        return;
-    }
-
-    error = hwc2_compat_display_accept_changes(m_display);
-    if (error != HWC2_ERROR_NONE) {
-        qDebug("prepare: acceptChanges failed: %d", error);
-        return;
-    }
-
-    hwc2_compat_display_set_client_target(m_display, /* slot */ 0, buffer,
-                                            acquireFenceFd,
-                                            HAL_DATASPACE_UNKNOWN);
-
-    int presentFence = -1;
-    hwc2_compat_display_present(m_display, &presentFence);
-
-
-    if (lastPresentFence != -1) {
-        sync_wait(lastPresentFence, -1);
-        close(lastPresentFence);
-    }
-
-    lastPresentFence = presentFence != -1 ? dup(presentFence) : -1;
-
-    HWCNativeBufferSetFence(buffer, presentFence);
-}
-
-HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t *display)
+HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_display_t display)
     : Output(backend)
     , m_renderLoop(std::make_unique<RenderLoop>())
     , m_backend(backend)
-    , m_display(display)
+    , m_displayId(display)
 {
+    m_display = hwc2_compat_device_get_display_by_id(backend->hwc2_device(), m_displayId);
 
     HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_display);
     Q_ASSERT(config);
@@ -273,9 +180,9 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
     // Set output information
     // Since Hwcomposer does not provide an EDID structure, we use placeholders for EDID information
     setInformation(Information{
-        .name = QStringLiteral("hwcomposer"),
+        .name = QStringLiteral("hwcomposer-%1").arg(m_displayId),
         .manufacturer = QStringLiteral("Android"),
-        .model = QStringLiteral("Lindroid"),
+        .model = QStringLiteral("Android"),
         .serialNumber = QString(),
         .eisaId = QString(),
         .physicalSize = physicalSize.toSize(),
@@ -287,9 +194,8 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_displ
         .nonDesktop = false,
     });
 
-    setStatesInternal();
+    resetStates();
 }
-
 
 HwcomposerOutput::~HwcomposerOutput()
 {
@@ -298,65 +204,26 @@ HwcomposerOutput::~HwcomposerOutput()
     }
 }
 
-HwcomposerWindow *HwcomposerOutput::createSurface()
+RenderLoop *HwcomposerOutput::renderLoop() const
 {
-    return m_backend->createSurface();
+    return m_renderLoop.get();
 }
 
-QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
+void HwcomposerOutput::setDpmsMode(DpmsMode mode)
 {
-    const int height = pixelSize().height();
-    const QMatrix4x4 matrix = Output::logicalToNativeMatrix(rect(), scale(), transform());
-    QVector<EGLint> rects;
-    rects.reserve(region.rectCount() * 4);
-    for (const QRect &_rect : region) {
-        const QRect rect = matrix.mapRect(_rect);
-        rects << rect.left();
-        rects << height - (rect.y() + rect.height());
-        rects << rect.width();
-        rects << rect.height();
-    }
-    return rects;
 }
 
-void HwcomposerOutput::compositing(int flags)
+void HwcomposerOutput::updateEnabled(bool enable)
 {
-    m_compositingSemaphore.release();
-    if (flags > 0) {
-        RenderLoopPrivate *renderLoopPrivate = RenderLoopPrivate::get(m_renderLoop.get());
-        if (renderLoopPrivate->pendingFrameCount > 0) {
-            qint64 now = std::chrono::steady_clock::now().time_since_epoch().count();
-            qint64 next_vsync = m_vsync_last_timestamp + m_vsyncPeriod;
-
-            if ((next_vsync - now) <= m_idle_time) {
-                // Too close! Sad
-                std::chrono::nanoseconds ntimestamp(next_vsync + m_vsyncPeriod - m_idle_time);
-                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
-            } else {
-                // We can go ahead
-                std::chrono::nanoseconds ntimestamp(next_vsync - m_idle_time);
-                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
-            }
-        }
-    }
-    m_compositingSemaphore.acquire();
+    m_isEnabled = enable;
 }
 
-void HwcomposerOutput::notifyFrame()
+bool HwcomposerOutput::isEnabled() const
 {
-    int flags = 1;
-    if (m_compositingSemaphore.available() > 0) {
-        flags = 0;
-    }
-    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection, Q_ARG(int, flags));
+    return m_isEnabled;
 }
 
-void HwcomposerOutput::handleVSync(int64_t timestamp)
-{
-    m_vsync_last_timestamp = timestamp;
-}
-
-void HwcomposerOutput::setStatesInternal()
+void HwcomposerOutput::resetStates()
 {
     // Retrieve and set display configuration attributes
     HWC2DisplayConfig *config = hwc2_compat_display_get_active_config(m_display);
@@ -421,29 +288,150 @@ void HwcomposerOutput::setStatesInternal()
     setState(initialState);
 }
 
-void HwcomposerOutput::updateEnabled(bool enable)
+void HwcomposerOutput::notifyFrame()
 {
-    m_isEnabled = enable;
+    int flags = 1;
+    if (m_compositingSemaphore.available() > 0) {
+        flags = 0;
+    }
+    QMetaObject::invokeMethod(this, "compositing", Qt::QueuedConnection, Q_ARG(int, flags));
 }
 
-bool HwcomposerOutput::isEnabled() const
+void HwcomposerOutput::handleVSync(int64_t timestamp)
 {
-    return m_isEnabled;
+    m_vsync_last_timestamp = timestamp;
 }
 
-RenderLoop *HwcomposerOutput::renderLoop() const
+HwcomposerWindow *HwcomposerOutput::createSurface()
 {
-    return m_renderLoop.get();
+    return new HwcomposerWindow(this);
 }
 
-void HwcomposerOutput::setDpmsMode(DpmsMode mode)
+void HwcomposerOutput::enableVSync(bool enable)
 {
-
+    if (m_hasVsync == enable) {
+        return;
+    }
+    hwc2_compat_display_set_vsync_enabled(m_display, enable ? HWC2_VSYNC_ENABLE : HWC2_VSYNC_DISABLE);
+    m_hasVsync = enable;
 }
 
-void HwcomposerOutput::updateDpmsMode(DpmsMode mode)
+void HwcomposerOutput::toggleBlankOutput()
 {
-    Q_EMIT dpmsModeRequested(mode);
+    m_outputBlank = !m_outputBlank;
+    enableVSync(!m_outputBlank);
+
+    hwc2_compat_display_set_power_mode(m_display, m_outputBlank ? HWC2_POWER_MODE_OFF : HWC2_POWER_MODE_ON);
+}
+
+QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
+{
+    const int height = pixelSize().height();
+    const QMatrix4x4 matrix = Output::logicalToNativeMatrix(rect(), scale(), transform());
+    QVector<EGLint> rects;
+    rects.reserve(region.rectCount() * 4);
+    for (const QRect &_rect : region) {
+        const QRect rect = matrix.mapRect(_rect);
+        rects << rect.left();
+        rects << height - (rect.y() + rect.height());
+        rects << rect.width();
+        rects << rect.height();
+    }
+    return rects;
+}
+
+void HwcomposerOutput::compositing(int flags)
+{
+    m_compositingSemaphore.release();
+    if (flags > 0) {
+        RenderLoopPrivate *renderLoopPrivate = RenderLoopPrivate::get(m_renderLoop.get());
+        if (renderLoopPrivate->pendingFrameCount > 0) {
+            qint64 now = std::chrono::steady_clock::now().time_since_epoch().count();
+            qint64 next_vsync = m_vsync_last_timestamp + m_vsyncPeriod;
+
+            if ((next_vsync - now) <= m_idle_time) {
+                // Too close! Sad
+                std::chrono::nanoseconds ntimestamp(next_vsync + m_vsyncPeriod - m_idle_time);
+                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+            } else {
+                // We can go ahead
+                std::chrono::nanoseconds ntimestamp(next_vsync - m_idle_time);
+                renderLoopPrivate->notifyFrameCompleted(ntimestamp);
+            }
+        }
+    }
+    m_compositingSemaphore.acquire();
+}
+
+HwcomposerWindow::HwcomposerWindow(HwcomposerOutput *output)
+    : HWComposerNativeWindow(output->pixelSize().width(), output->pixelSize().height(), HAL_PIXEL_FORMAT_RGBA_8888)
+    , m_output(output)
+{
+    m_display = m_output->hwc2_display();
+    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_display);
+    hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
+    hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
+
+    hwc2_compat_layer_set_source_crop(layer, 0.0f, 0.0f, m_output->pixelSize().width(), m_output->pixelSize().height());
+    hwc2_compat_layer_set_display_frame(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
+    hwc2_compat_layer_set_visible_region(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
+}
+
+HwcomposerWindow::~HwcomposerWindow()
+{
+    if (lastPresentFence != -1) {
+        close(lastPresentFence);
+    }
+}
+
+void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)
+{
+    uint32_t numTypes = 0;
+    uint32_t numRequests = 0;
+    int displayId = m_output->displayId();
+    hwc2_error_t error = HWC2_ERROR_NONE;
+
+    int acquireFenceFd = HWCNativeBufferGetFence(buffer);
+    int syncBeforeSet = 1;
+
+    if (syncBeforeSet && acquireFenceFd >= 0) {
+        sync_wait(acquireFenceFd, -1);
+        close(acquireFenceFd);
+        acquireFenceFd = -1;
+    }
+
+    error = hwc2_compat_display_validate(m_display, &numTypes, &numRequests);
+    if (error != HWC2_ERROR_NONE && error != HWC2_ERROR_HAS_CHANGES) {
+        qDebug("prepare: validate failed for display %d: %d", displayId, error);
+        return;
+    }
+
+    if (numTypes || numRequests) {
+        qDebug("prepare: validate required changes for display %d: %d", displayId, error);
+        return;
+    }
+
+    error = hwc2_compat_display_accept_changes(m_display);
+    if (error != HWC2_ERROR_NONE) {
+        qDebug("prepare: acceptChanges failed: %d", error);
+        return;
+    }
+
+    hwc2_compat_display_set_client_target(m_display, /* slot */ 0, buffer,
+                                          acquireFenceFd,
+                                          HAL_DATASPACE_UNKNOWN);
+
+    int presentFence = -1;
+    hwc2_compat_display_present(m_display, &presentFence);
+
+    if (lastPresentFence != -1) {
+        sync_wait(lastPresentFence, -1);
+        close(lastPresentFence);
+    }
+
+    lastPresentFence = presentFence != -1 ? dup(presentFence) : -1;
+
+    HWCNativeBufferSetFence(buffer, presentFence);
 }
 
 }  // namespace KWin

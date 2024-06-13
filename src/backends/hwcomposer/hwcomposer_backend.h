@@ -37,28 +37,38 @@ class HwcomposerOutput : public Output
 {
     Q_OBJECT
 public:
-    HwcomposerOutput(HwcomposerBackend *backend, hwc2_compat_display_t* display);
+    HwcomposerOutput(HwcomposerBackend *backend, hwc2_display_t display);
     ~HwcomposerOutput() override;
 
     RenderLoop *renderLoop() const override;
     void setDpmsMode(DpmsMode mode) override;
-    void updateDpmsMode(DpmsMode mode);
     void updateEnabled(bool enable);
     bool isEnabled() const;
-    void setStatesInternal();
+    void resetStates();
     void notifyFrame();
     void handleVSync(int64_t timestamp);
-
-    QVector<int32_t> regionToRects(const QRegion &region) const;
     HwcomposerWindow *createSurface();
+    void enableVSync(bool enable);
+    void toggleBlankOutput();
+    QVector<int32_t> regionToRects(const QRegion &region) const;
 
-Q_SIGNALS:
-    void dpmsModeRequested(HwcomposerOutput::DpmsMode mode);
+    hwc2_compat_display_t *hwc2_display() const
+    {
+        return m_display;
+    }
+
+    hwc2_display_t displayId() const
+    {
+        return m_displayId;
+    }
+
 private Q_SLOTS:
     void compositing(int flags);
 
 private:
-    friend class HwcomposerBackend;
+    friend HwcomposerWindow;
+
+    hwc2_compat_display_t *m_display;
     std::unique_ptr<RenderLoop> m_renderLoop;
     QSize m_pixelSize;
     bool m_isEnabled = true;
@@ -66,9 +76,11 @@ private:
     qint64 m_vsyncPeriod;
     qint64 m_idle_time;
     qint64 m_vsync_last_timestamp;
+    bool m_hasVsync = false;
+    bool m_outputBlank = true;
 
     HwcomposerBackend *m_backend;
-    hwc2_compat_display_t *m_display;
+    hwc2_display_t m_displayId;
 };
 
 class KWIN_EXPORT HwcomposerBackend : public OutputBackend
@@ -81,51 +93,30 @@ public:
     bool initialize() override;
     std::unique_ptr<OpenGLBackend> createOpenGLBackend() override;
     std::unique_ptr<InputBackend> createInputBackend() override;
-
     Outputs outputs() const override;
 
-    //TODO: Move to outputs
-    QSize size() const;
-    HwcomposerWindow *createSurface();
-    void enableVSync(bool enable);
-
-    void updateOutputState(hwc2_display_t display);
     void wakeVSync(hwc2_display_t display, int64_t timestamp);
+    void handleHotplug(hwc2_display_t display, bool connected, bool primaryDisplay);
+    void updateOutputState(hwc2_display_t display);
 
-    QVector<CompositingType> supportedCompositors() const override {
+    QVector<CompositingType> supportedCompositors() const override
+    {
         return QVector<CompositingType>{OpenGLCompositing};
     }
 
-    bool isBacklightOff() const {
-        return m_outputBlank;
-    }
-
-    hwc2_compat_device_t *hwc2_device() const {
+    hwc2_compat_device_t *hwc2_device() const
+    {
         return m_hwc2device;
     }
 
-    //TODO: Move to outputs
-    hwc2_compat_display_t *hwc2_display() const {
-        return m_hwc2_primary_display;
-    }
-
-private Q_SLOTS:
-    void toggleBlankOutput();
-
 private:
-    friend HwcomposerWindow;
-    Session *m_session;
-
     void RegisterCallbacks();
+    void createOutput(hwc2_display_t display);
 
-    //TODO: Change to outputs
-    std::unique_ptr<HwcomposerOutput> m_output;
-    //TODO: Move to outputs
-    bool m_hasVsync = false;
-    bool m_outputBlank = true;
-    hwc2_compat_display_t *m_hwc2_primary_display = nullptr;
-
+    std::map<hwc2_display_t, std::unique_ptr<HwcomposerOutput>> m_outputs;
     hwc2_compat_device_t *m_hwc2device = nullptr;
+
+    Session *m_session;
 };
 
 class HwcomposerWindow : public HWComposerNativeWindow
@@ -135,12 +126,11 @@ public:
     void present(HWComposerNativeWindowBuffer *buffer) override;
 
 private:
-    friend HwcomposerBackend;
-    HwcomposerWindow(HwcomposerBackend *backend);
-    HwcomposerBackend *m_backend;
+    friend HwcomposerOutput;
+
+    HwcomposerWindow(HwcomposerOutput *output);
+    HwcomposerOutput *m_output;
     int lastPresentFence = -1;
-
-    hwc2_compat_display_t *m_display = nullptr;
+    hwc2_compat_display_t *m_display;
 };
-
 }
