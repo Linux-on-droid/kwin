@@ -54,7 +54,7 @@ public:
     void handleVSync(int64_t timestamp);
     HwcomposerWindow *createSurface();
     void enableVSync(bool enable);
-    void toggleBlankOutput();
+    void setPowerMode(bool enable);
     QVector<int32_t> regionToRects(const QRegion &region) const;
 
     hwc2_compat_display_t *hwc2_display() const
@@ -81,7 +81,6 @@ private:
     qint64 m_idle_time;
     qint64 m_vsync_last_timestamp;
     bool m_hasVsync = false;
-    bool m_outputBlank = true;
     QTimer m_turnOffTimer;
 
     HwcomposerBackend *m_backend;

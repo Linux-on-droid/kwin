@@ -78,7 +78,7 @@ void HwcomposerBackend::RegisterCallbacks()
 void HwcomposerBackend::createOutput(hwc2_display_t display)
 {
     m_outputs[display] = std::make_unique<HwcomposerOutput>(this, display);
-    m_outputs[display]->toggleBlankOutput();
+    m_outputs[display]->setPowerMode(true);
 
     Q_EMIT outputAdded(m_outputs[display].get());
 }
@@ -251,6 +251,8 @@ void HwcomposerOutput::setDpmsMode(DpmsMode mode)
 
 void HwcomposerOutput::updateDpmsMode(DpmsMode dpmsMode)
 {
+    setPowerMode(dpmsMode == DpmsMode::On);
+
     State next = m_state;
     next.dpmsMode = dpmsMode;
     setState(next);
@@ -356,12 +358,10 @@ void HwcomposerOutput::enableVSync(bool enable)
     m_hasVsync = enable;
 }
 
-void HwcomposerOutput::toggleBlankOutput()
+void HwcomposerOutput::setPowerMode(bool enable)
 {
-    m_outputBlank = !m_outputBlank;
-    enableVSync(!m_outputBlank);
-
-    hwc2_compat_display_set_power_mode(m_display, m_outputBlank ? HWC2_POWER_MODE_OFF : HWC2_POWER_MODE_ON);
+    enableVSync(enable);
+    hwc2_compat_display_set_power_mode(m_display, enable ? HWC2_POWER_MODE_ON : HWC2_POWER_MODE_OFF);
 }
 
 QVector<int32_t> HwcomposerOutput::regionToRects(const QRegion &region) const
