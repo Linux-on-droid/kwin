@@ -117,6 +117,21 @@ Outputs HwcomposerBackend::outputs() const
     return outputs;
 }
 
+void HwcomposerBackend::createDpmsFilter()
+{
+    if (m_dpmsFilter) {
+        // already another output is off
+        return;
+    }
+    m_dpmsFilter = std::make_unique<DpmsInputEventFilter>();
+    input()->prependInputEventFilter(m_dpmsFilter.get());
+}
+
+void HwcomposerBackend::clearDpmsFilter()
+{
+    m_dpmsFilter.reset();
+}
+
 void HwcomposerBackend::wakeVSync(hwc2_display_t display, int64_t timestamp)
 {
     if (m_outputs.find(display) != m_outputs.end())
@@ -194,6 +209,12 @@ HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_display_t di
         .nonDesktop = false,
     });
 
+    m_turnOffTimer.setSingleShot(true);
+    m_turnOffTimer.setInterval(dimAnimationTime());
+    connect(&m_turnOffTimer, &QTimer::timeout, this, [this] {
+        updateDpmsMode(DpmsMode::Off);
+    });
+
     resetStates();
 }
 
@@ -211,16 +232,35 @@ RenderLoop *HwcomposerOutput::renderLoop() const
 
 void HwcomposerOutput::setDpmsMode(DpmsMode mode)
 {
+    if (mode == DpmsMode::Off) {
+        if (!m_turnOffTimer.isActive()) {
+            Q_EMIT aboutToTurnOff(std::chrono::milliseconds(m_turnOffTimer.interval()));
+            m_turnOffTimer.start();
+        }
+        m_backend->createDpmsFilter();
+    } else {
+        m_turnOffTimer.stop();
+        m_backend->clearDpmsFilter();
+
+        if (mode != dpmsMode()) {
+            updateDpmsMode(mode);
+            Q_EMIT wakeUp();
+        }
+    }
 }
 
-void HwcomposerOutput::updateEnabled(bool enable)
+void HwcomposerOutput::updateDpmsMode(DpmsMode dpmsMode)
 {
-    m_isEnabled = enable;
+    State next = m_state;
+    next.dpmsMode = dpmsMode;
+    setState(next);
 }
 
-bool HwcomposerOutput::isEnabled() const
+void HwcomposerOutput::updateEnabled(bool enabled)
 {
-    return m_isEnabled;
+    State next = m_state;
+    next.enabled = enabled;
+    setState(next);
 }
 
 void HwcomposerOutput::resetStates()
