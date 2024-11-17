@@ -328,6 +328,7 @@ void HwcomposerOutput::resetStates()
     initialState.scale = scale;
 
     setState(initialState);
+    Q_EMIT m_backend->outputsQueried();
 }
 
 void HwcomposerOutput::notifyFrame()
