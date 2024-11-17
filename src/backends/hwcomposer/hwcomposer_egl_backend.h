@@ -37,6 +37,7 @@ public:
     OutputLayer *primaryLayer(Output *output) override;
     void init() override;
     void present(Output *output) override;
+    HwcomposerBackend *get_backend();
 
 private:
     bool initializeEgl();

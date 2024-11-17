@@ -162,6 +162,20 @@ void HwcomposerBackend::updateOutputState(hwc2_display_t display)
     Q_EMIT outputsQueried();
 }
 
+bool HwcomposerBackend::needs_reset()
+{
+    if(m_neds_rest) {
+        m_neds_rest=false;
+        return true;
+    }
+    return false;
+}
+
+void HwcomposerBackend::set_needs_reset()
+{
+    m_neds_rest=true;
+}
+
 HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_display_t display)
     : Output(backend)
     , m_renderLoop(std::make_unique<RenderLoop>())
@@ -328,6 +342,11 @@ void HwcomposerOutput::resetStates()
     initialState.scale = scale;
 
     setState(initialState);
+    
+    if (surface) {
+    surface->update(width, height);
+	}
+    m_backend->set_needs_reset();
     Q_EMIT m_backend->outputsQueried();
 }
 
@@ -347,7 +366,8 @@ void HwcomposerOutput::handleVSync(int64_t timestamp)
 
 HwcomposerWindow *HwcomposerOutput::createSurface()
 {
-    return new HwcomposerWindow(this);
+    surface = new HwcomposerWindow(this);
+    return surface;
 }
 
 void HwcomposerOutput::enableVSync(bool enable)
@@ -409,7 +429,7 @@ HwcomposerWindow::HwcomposerWindow(HwcomposerOutput *output)
     , m_output(output)
 {
     m_display = m_output->hwc2_display();
-    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_display);
+    layer = hwc2_compat_display_create_layer(m_display);
     hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
     hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
 
@@ -417,6 +437,14 @@ HwcomposerWindow::HwcomposerWindow(HwcomposerOutput *output)
     hwc2_compat_layer_set_display_frame(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
     hwc2_compat_layer_set_visible_region(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
 }
+
+void HwcomposerWindow::update(int width, int height)
+{
+    hwc2_compat_layer_set_source_crop(layer, 0.0f, 0.0f, width, height);
+    hwc2_compat_layer_set_display_frame(layer, 0, 0, width, height);
+    hwc2_compat_layer_set_visible_region(layer, 0, 0, width, height);
+}
+
 
 HwcomposerWindow::~HwcomposerWindow()
 {

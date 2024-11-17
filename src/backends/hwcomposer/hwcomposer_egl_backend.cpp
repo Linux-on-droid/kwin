@@ -142,6 +142,11 @@ void EglHwcomposerBackend::present(Output *output)
     static_cast<HwcomposerOutput *>(output)->notifyFrame();
 }
 
+HwcomposerBackend* EglHwcomposerBackend::get_backend()
+{
+    return m_backend;
+}
+
 std::unique_ptr<SurfaceTexture> EglHwcomposerBackend::createSurfaceTextureInternal(SurfacePixmapInternal *pixmap)
 {
     return std::make_unique<BasicEGLSurfaceTextureInternal>(this, pixmap);
@@ -227,6 +232,12 @@ bool EglHwcomposerOutput::endFrame(const QRegion &renderedRegion, const QRegion 
 
 void EglHwcomposerOutput::present()
 {
+    if(m_backend->get_backend()->needs_reset()) {
+    	m_nativeSurface = m_output->createSurface();
+        eglDestroySurface(m_backend->eglDisplay(), m_surface);
+        m_surface = eglCreateWindowSurface(m_backend->eglDisplay(), m_backend->config(), (EGLNativeWindowType) static_cast<ANativeWindow *>(m_nativeSurface), nullptr);
+        return;
+    }
     if (m_backend->supportsSwapBuffersWithDamage() && m_backend->supportsPartialUpdate()) {
         QVector<EGLint> rects = m_output->regionToRects(m_currentDamage);
         const bool correct = eglSwapBuffersWithDamageKHR(m_backend->eglDisplay(), surface(), rects.data(), rects.count() / 4);

@@ -72,7 +72,7 @@ private Q_SLOTS:
 
 private:
     friend HwcomposerWindow;
-
+    HwcomposerWindow *surface;
     hwc2_compat_display_t *m_display;
     std::unique_ptr<RenderLoop> m_renderLoop;
     QSize m_pixelSize;
@@ -100,7 +100,8 @@ public:
     Outputs outputs() const override;
     void createDpmsFilter();
     void clearDpmsFilter();
-
+    bool needs_reset();
+    void set_needs_reset();
     void wakeVSync(hwc2_display_t display, int64_t timestamp);
     void handleHotplug(hwc2_display_t display, bool connected, bool primaryDisplay);
     void updateOutputState(hwc2_display_t display);
@@ -122,7 +123,7 @@ private:
     std::map<hwc2_display_t, std::unique_ptr<HwcomposerOutput>> m_outputs;
     hwc2_compat_device_t *m_hwc2device = nullptr;
     std::unique_ptr<DpmsInputEventFilter> m_dpmsFilter;
-
+    bool m_neds_rest = false;
     Session *m_session;
 };
 
@@ -131,10 +132,10 @@ class HwcomposerWindow : public HWComposerNativeWindow
 public:
     virtual ~HwcomposerWindow();
     void present(HWComposerNativeWindowBuffer *buffer) override;
-
+    void update(int width, int height);
 private:
     friend HwcomposerOutput;
-
+    hwc2_compat_layer_t *layer;
     HwcomposerWindow(HwcomposerOutput *output);
     HwcomposerOutput *m_output;
     int lastPresentFence = -1;
