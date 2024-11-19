@@ -159,7 +159,6 @@ void HwcomposerBackend::handleHotplug(hwc2_display_t display, bool connected, bo
 void HwcomposerBackend::updateOutputState(hwc2_display_t display)
 {
     m_outputs[display]->resetStates();
-    Q_EMIT outputsQueried();
 }
 
 HwcomposerOutput::HwcomposerOutput(HwcomposerBackend *backend, hwc2_display_t display)
@@ -318,16 +317,15 @@ void HwcomposerOutput::resetStates()
 
     m_renderLoop->setRefreshRate(10E11 / m_vsyncPeriod);
 
-    QList<std::shared_ptr<OutputMode>> modes;
     OutputMode::Flags modeFlags = OutputMode::Flag::Preferred;
     std::shared_ptr<OutputMode> mode = std::make_shared<OutputMode>(pixelSize, m_renderLoop->refreshRate(), modeFlags);
-    modes << mode;
-    State initialState;
-    initialState.modes = modes;
-    initialState.currentMode = modes.constFirst();
-    initialState.scale = scale;
 
-    setState(initialState);
+    State next = m_state;
+    next.modes = {mode};
+    next.currentMode = mode;
+    setState(next);
+
+    Q_EMIT m_backend->outputsQueried();
 }
 
 void HwcomposerOutput::notifyFrame()
