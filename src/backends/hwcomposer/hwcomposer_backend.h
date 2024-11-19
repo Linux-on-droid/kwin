@@ -85,6 +85,8 @@ private:
 
     HwcomposerBackend *m_backend;
     hwc2_display_t m_displayId;
+    
+    
 };
 
 class KWIN_EXPORT HwcomposerBackend : public OutputBackend
@@ -105,6 +107,9 @@ public:
     void handleHotplug(hwc2_display_t display, bool connected, bool primaryDisplay);
     void updateOutputState(hwc2_display_t display);
 
+    void setResizeCallback(const std::function<void()>& callback);
+    void reSize();
+
     QVector<CompositingType> supportedCompositors() const override
     {
         return QVector<CompositingType>{OpenGLCompositing};
@@ -124,6 +129,7 @@ private:
     std::unique_ptr<DpmsInputEventFilter> m_dpmsFilter;
 
     Session *m_session;
+    std::function<void()> m_resize_callback;
 };
 
 class HwcomposerWindow : public HWComposerNativeWindow
@@ -139,5 +145,6 @@ private:
     HwcomposerOutput *m_output;
     int lastPresentFence = -1;
     hwc2_compat_display_t *m_display;
+    hwc2_compat_layer_t *m_layer;
 };
 }

@@ -124,6 +124,12 @@ bool EglHwcomposerBackend::initRenderingContext()
         }
     }
 
+    m_backend->setResizeCallback([this]() {
+        for (auto &[key, value] : m_outputs) {
+        //    value->reInitSurface();
+        }
+    });
+
     if (m_outputs.empty()) {
         qCCritical(KWIN_HWCOMPOSER) << "Create Window Surfaces failed";
         return false;
@@ -179,6 +185,14 @@ EglHwcomposerOutput::~EglHwcomposerOutput()
     if (m_surface != EGL_NO_SURFACE) {
         eglDestroySurface(m_backend->eglDisplay(), m_surface);
     }
+}
+
+void EglHwcomposerOutput::reInitSurface()
+{
+    delete m_nativeSurface;
+    m_nativeSurface = m_output->createSurface();
+    eglDestroySurface(m_backend->eglDisplay(), m_surface);
+    m_surface = eglCreateWindowSurface(m_backend->eglDisplay(), m_backend->config(), (EGLNativeWindowType) static_cast<ANativeWindow *>(m_nativeSurface), nullptr);
 }
 
 bool EglHwcomposerOutput::makeContextCurrent() const

@@ -59,6 +59,7 @@ public:
     void aboutToStartPainting(const QRegion &damagedRegion) override;
     bool endFrame(const QRegion &renderedRegion, const QRegion &damagedRegion) override;
     void present();
+    void reInitSurface();
 
     EGLSurface surface() const
     {
