@@ -409,13 +409,13 @@ HwcomposerWindow::HwcomposerWindow(HwcomposerOutput *output)
     , m_output(output)
 {
     m_display = m_output->hwc2_display();
-    hwc2_compat_layer_t *layer = hwc2_compat_display_create_layer(m_display);
-    hwc2_compat_layer_set_composition_type(layer, HWC2_COMPOSITION_CLIENT);
-    hwc2_compat_layer_set_blend_mode(layer, HWC2_BLEND_MODE_NONE);
+    m_layer = hwc2_compat_display_create_layer(m_display);
+    hwc2_compat_layer_set_composition_type(m_layer, HWC2_COMPOSITION_CLIENT);
+    hwc2_compat_layer_set_blend_mode(m_layer, HWC2_BLEND_MODE_NONE);
 
-    hwc2_compat_layer_set_source_crop(layer, 0.0f, 0.0f, m_output->pixelSize().width(), m_output->pixelSize().height());
-    hwc2_compat_layer_set_display_frame(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
-    hwc2_compat_layer_set_visible_region(layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
+    hwc2_compat_layer_set_source_crop(m_layer, 0.0f, 0.0f, m_output->pixelSize().width(), m_output->pixelSize().height());
+    hwc2_compat_layer_set_display_frame(m_layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
+    hwc2_compat_layer_set_visible_region(m_layer, 0, 0, m_output->pixelSize().width(), m_output->pixelSize().height());
 }
 
 HwcomposerWindow::~HwcomposerWindow()
@@ -423,6 +423,7 @@ HwcomposerWindow::~HwcomposerWindow()
     if (lastPresentFence != -1) {
         close(lastPresentFence);
     }
+    hwc2_compat_display_destroy_layer(m_display, m_layer);
 }
 
 void HwcomposerWindow::present(HWComposerNativeWindowBuffer *buffer)

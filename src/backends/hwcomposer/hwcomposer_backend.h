@@ -139,5 +139,6 @@ private:
     HwcomposerOutput *m_output;
     int lastPresentFence = -1;
     hwc2_compat_display_t *m_display;
+    hwc2_compat_layer_t *m_layer;
 };
 }
