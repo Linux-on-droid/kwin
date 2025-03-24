@@ -42,6 +42,11 @@
 #include <libdrm/drm_mode.h>
 #include <xf86drm.h>
 
+
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
 namespace KWin
 {
 
@@ -207,7 +212,7 @@ void DrmBackend::handleUdevEvent()
 
 DrmGpu *DrmBackend::addGpu(const QString &fileName)
 {
-    int fd = m_session->openRestricted(fileName);
+    int fd = open(fileName.toLocal8Bit().constData(), O_RDWR | O_CLOEXEC);
     if (fd < 0) {
         qCWarning(KWIN_DRM) << "failed to open drm device at" << fileName;
         return nullptr;

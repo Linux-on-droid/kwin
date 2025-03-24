@@ -578,8 +578,8 @@ void Workspace::updateOutputConfiguration()
 
     if (!applyOutputConfiguration(cfg, order)) {
         qCWarning(KWIN_CORE) << "Applying output config failed!";
-        setFallbackOutputOrder();
-        return;
+//        setFallbackOutputOrder();
+//        return;
     }
     setOutputOrder(order);
     if (type == OutputConfigurationStore::ConfigType::Generated) {

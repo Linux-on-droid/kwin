@@ -537,8 +537,8 @@ void DrmGpu::pageFlipHandler(int fd, unsigned int sequence, unsigned int sec, un
     std::chrono::nanoseconds timestamp = convertTimestamp(gpu->presentationClock(), CLOCK_MONOTONIC,
                                                           {static_cast<time_t>(sec), static_cast<long>(usec * 1000)});
     if (timestamp == std::chrono::nanoseconds::zero()) {
-        qCDebug(KWIN_DRM, "Got invalid timestamp (sec: %u, usec: %u) on gpu %s",
-                sec, usec, qPrintable(gpu->drmDevice()->path()));
+    //    qCDebug(KWIN_DRM, "Got invalid timestamp (sec: %u, usec: %u) on gpu %s",
+    //            sec, usec, qPrintable(gpu->drmDevice()->path()));
         timestamp = std::chrono::steady_clock::now().time_since_epoch();
     }
     commit->pageFlipped(timestamp);
@@ -860,15 +860,17 @@ std::shared_ptr<DrmFramebuffer> DrmGpu::importBuffer(GraphicsBuffer *buffer, Fil
         }
     });
     for (int i = 0; i < attributes->planeCount; ++i) {
-        if (drmPrimeFDToHandle(m_fd, attributes->fd[i].get(), &handles[i]) != 0) {
-            qCWarning(KWIN_DRM) << "drmPrimeFDToHandle() failed";
-            return nullptr;
-        }
+//        if (drmPrimeFDToHandle(m_fd, attributes->fd[i].get(), &handles[i]) != 0) {
+//            qCWarning(KWIN_DRM) << "drmPrimeFDToHandle() failed";
+//            return nullptr;
+//        }
+handles[i]=attributes->fd[i].get();
+
     }
 
     uint32_t framebufferId = 0;
     int ret;
-    if (addFB2ModifiersSupported() && attributes->modifier != DRM_FORMAT_MOD_INVALID) {
+/*    if (addFB2ModifiersSupported() && attributes->modifier != DRM_FORMAT_MOD_INVALID) {
         uint64_t modifier[4] = {0, 0, 0, 0};
         for (int i = 0; i < attributes->planeCount; ++i) {
             modifier[i] = attributes->modifier;
@@ -892,17 +894,17 @@ std::shared_ptr<DrmFramebuffer> DrmGpu::importBuffer(GraphicsBuffer *buffer, Fil
                             attributes->pitch.data(),
                             attributes->offset.data(),
                             &framebufferId,
-                            0);
-        if (ret == EOPNOTSUPP && attributes->planeCount == 1) {
+                            0);*/
+  //      if (ret == EOPNOTSUPP && attributes->planeCount == 1) {
             ret = drmModeAddFB(m_fd,
                                attributes->width,
                                attributes->height,
                                24, 32,
-                               attributes->pitch[0],
+                               9999,
                                handles[0],
                                &framebufferId);
-        }
-    }
+//        }
+//    }
 
     if (ret != 0) {
         return nullptr;

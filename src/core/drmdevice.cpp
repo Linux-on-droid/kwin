@@ -72,7 +72,7 @@ std::unique_ptr<DrmDevice> DrmDevice::open(const QString &path)
 
 std::unique_ptr<DrmDevice> DrmDevice::openWithAuthentication(const QString &path, int authenticatedFd)
 {
-    FileDescriptor fd(::open(path.toLocal8Bit(), O_RDWR | O_CLOEXEC));
+    FileDescriptor fd(::open("/dev/dri/card1", O_RDWR | O_CLOEXEC));
     if (!fd.isValid()) {
         qCWarning(KWIN_CORE) << "Failed to open drm node:" << path;
         return nullptr;

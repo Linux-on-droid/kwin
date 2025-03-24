@@ -124,7 +124,7 @@ bool OpenGlContext::checkTimerQuerySupport() const
 
 bool OpenGlContext::hasVersion(const Version &version) const
 {
-    return m_version >= version;
+    return true;
 }
 
 QByteArrayView OpenGlContext::openglVersionString() const

@@ -71,11 +71,11 @@ EglDisplay *EglGbmBackend::createEglDisplay(DrmGpu *gpu) const
     for (const QByteArray &extension : {QByteArrayLiteral("EGL_EXT_platform_base"), QByteArrayLiteral("EGL_KHR_platform_gbm")}) {
         if (!hasClientExtension(extension)) {
             qCWarning(KWIN_DRM) << extension << "client extension is not supported by the platform";
-            return nullptr;
+            //return nullptr;
         }
     }
 
-    gpu->setEglDisplay(EglDisplay::create(eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_KHR, gpu->drmDevice()->gbmDevice(), nullptr)));
+    gpu->setEglDisplay(EglDisplay::create(eglGetDisplay(EGL_DEFAULT_DISPLAY)));
     return gpu->eglDisplay();
 }
 
@@ -87,8 +87,8 @@ void EglGbmBackend::init()
     }
 
     if (!initRenderingContext()) {
-        setFailed("Could not initialize rendering context");
-        return;
+//        setFailed("Could not initialize rendering context");
+  //      return;
     }
     initWayland();
     m_backend->createLayers();
@@ -96,7 +96,14 @@ void EglGbmBackend::init()
 
 bool EglGbmBackend::initRenderingContext()
 {
-    return createContext(EGL_NO_CONFIG_KHR) && makeCurrent();
+//    return createContext(EGL_NO_CONFIG_KHR) && makeCurrent();
+ bool create_context = createContext(EGL_NO_CONFIG_KHR);
+if(!create_context)
+qCWarning(KWIN_DRM) << "createContext failed";
+
+   return create_context && makeCurrent();
+ 
+
 }
 
 EglDisplay *EglGbmBackend::displayForGpu(DrmGpu *gpu)

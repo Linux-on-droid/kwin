@@ -29,7 +29,7 @@ static inline std::optional<DmaBufAttributes> dmaBufAttributesForBo(gbm_bo *bo)
     attributes.format = gbm_bo_get_format(bo);
     attributes.modifier = gbm_bo_get_modifier(bo);
 
-#if HAVE_GBM_BO_GET_FD_FOR_PLANE
+#if 0
     for (int i = 0; i < attributes.planeCount; ++i) {
         attributes.fd[i] = FileDescriptor{gbm_bo_get_fd_for_plane(bo, i)};
         if (!attributes.fd[i].isValid()) {

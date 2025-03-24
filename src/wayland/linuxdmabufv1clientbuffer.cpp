@@ -135,6 +135,7 @@ void LinuxDmaBufParamsV1::zwp_linux_buffer_params_v1_add(Resource *resource,
 
 void LinuxDmaBufParamsV1::zwp_linux_buffer_params_v1_create(Resource *resource, int32_t width, int32_t height, uint32_t format, uint32_t flags)
 {
+printf("zwp_linux_buffer_params_v1_create hi\n");
     if (Q_UNLIKELY(m_isUsed)) {
         wl_resource_post_error(resource->handle, error_already_used, "the params object has already been used to create a wl_buffer");
         return;
@@ -186,6 +187,8 @@ void LinuxDmaBufParamsV1::zwp_linux_buffer_params_v1_create_immed(Resource *reso
                                                                   uint32_t format,
                                                                   uint32_t flags)
 {
+printf("zwp_linux_buffer_params_v1_create_immed hi\n");
+
     if (Q_UNLIKELY(m_isUsed)) {
         wl_resource_post_error(resource->handle, error_already_used, "the params object has already been used to create a wl_buffer");
         return;
@@ -205,7 +208,7 @@ void LinuxDmaBufParamsV1::zwp_linux_buffer_params_v1_create_immed(Resource *reso
         wl_resource_post_error(resource->handle, error_invalid_wl_buffer, "dma-buf flags are not supported");
         return;
     }
-
+printf("zwp_linux_buffer_params_v1_create_immed checks done\n");
     m_isUsed = true;
 
     m_attrs.width = width;
@@ -213,12 +216,12 @@ void LinuxDmaBufParamsV1::zwp_linux_buffer_params_v1_create_immed(Resource *reso
     m_attrs.format = format;
 
     auto clientBuffer = new LinuxDmaBufV1ClientBuffer(std::move(m_attrs));
-    if (!renderBackend->testImportBuffer(clientBuffer)) {
-        wl_resource_post_error(resource->handle, error_invalid_wl_buffer, "importing the supplied dmabufs failed");
-        delete clientBuffer;
-        return;
-    }
-
+//    if (!renderBackend->testImportBuffer(clientBuffer)) {
+//        wl_resource_post_error(resource->handle, error_invalid_wl_buffer, "importing the supplied dmabufs failed");
+//        delete clientBuffer;
+//        return;
+//    }
+printf("zwp_linux_buffer_params_v1_create_immed: import done\n");
     wl_resource *bufferResource = wl_resource_create(resource->client(), &wl_buffer_interface, 1, buffer_id);
     if (!bufferResource) {
         wl_resource_post_no_memory(resource->handle);
@@ -264,9 +267,9 @@ bool LinuxDmaBufParamsV1::test(Resource *resource, uint32_t width, uint32_t heig
         // Don't report an error as it might be caused by the kernel not supporting
         // seeking on dmabuf.
         const off_t size = lseek(m_attrs.fd[i].get(), 0, SEEK_END);
-        if (size == -1) {
+//        if (size == -1) {
             continue;
-        }
+//        }
 
         if (Q_UNLIKELY(m_attrs.offset[i] >= size)) {
             wl_resource_post_error(resource->handle, error_out_of_bounds, "invalid offset %i for plane %d", m_attrs.offset[i], i);

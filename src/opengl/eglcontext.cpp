@@ -27,16 +27,20 @@ std::unique_ptr<EglContext> EglContext::create(EglDisplay *display, EGLConfig co
 {
     auto handle = createContext(display, config, sharedContext);
     if (!handle) {
-        return nullptr;
+printf("EglContext::create: createContext failed \n");
+    
+    return nullptr;
     }
     if (!eglMakeCurrent(display->handle(), EGL_NO_SURFACE, EGL_NO_SURFACE, handle)) {
+printf("EglContext::create: make current failed\n");
+
         eglDestroyContext(display->handle(), handle);
         return nullptr;
     }
     auto ret = std::make_unique<EglContext>(display, config, handle);
     s_currentContext = ret.get();
     if (!ret->checkSupported()) {
-        return nullptr;
+//        return nullptr;
     }
     return ret;
 }
@@ -140,6 +144,23 @@ static inline bool shouldUseOpenGLES()
     const bool haveCreateContext = display->hasExtension(QByteArrayLiteral("EGL_KHR_create_context"));
     const bool haveContextPriority = display->hasExtension(QByteArrayLiteral("EGL_IMG_context_priority"));
     const bool haveResetOnVideoMemoryPurge = display->hasExtension(QByteArrayLiteral("EGL_NV_robustness_video_memory_purge"));
+static const EGLint context_attribs[] = {
+                EGL_CONTEXT_CLIENT_VERSION, 2,
+                EGL_NONE
+        };
+
+        EGLint attr[] = {       // some attributes to set up our egl-interface
+               EGL_BUFFER_SIZE, 32,
+               EGL_RENDERABLE_TYPE,
+               EGL_OPENGL_ES2_BIT,
+               EGL_NONE
+       };
+
+EGLConfig ecfg;
+EGLint num_config;
+eglChooseConfig(eglGetDisplay(EGL_DEFAULT_DISPLAY), attr, &ecfg, 1, &num_config);
+return eglCreateContext(eglGetDisplay(EGL_DEFAULT_DISPLAY), ecfg,
+                        EGL_NO_CONTEXT, context_attribs);
 
     std::vector<std::unique_ptr<AbstractOpenGLContextAttributeBuilder>> candidates;
     if (shouldUseOpenGLES()) {

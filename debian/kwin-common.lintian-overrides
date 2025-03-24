@@ -1,0 +1,4 @@
+kwin-common: package-name-doesnt-match-sonames libkcmkwincommon6
+kwin-common: lacks-unversioned-link-to-shared-library example: usr/lib/*/libkcmkwincommon.so [usr/lib/*/libkcmkwincommon.so.*]
+# we don’t ship header files for these, so no need for control files
+kwin-common: no-symbols-control-file usr/lib/*/libkcmkwincommon.so.6.*

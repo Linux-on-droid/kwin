@@ -1,0 +1,15 @@
+usr/share/applications/kcm_kwin*.desktop
+usr/share/applications/kcm_virtualkeyboard.desktop
+usr/share/applications/kwin*.desktop
+usr/share/config.kcfg/kwin*.kcfg
+usr/share/config.kcfg/nightlightsettings.kcfg
+usr/share/config.kcfg/virtualdesktopssettings.kcfg
+usr/share/doc/*/*/kcontrol/
+usr/share/icons/*/*/apps/kwin.*
+usr/share/kconf_update/kwin*.upd
+usr/share/knotifications6/kwin.notifyrc
+usr/share/knsrcfiles/
+usr/share/krunner/dbusplugins/kwin-runner-windows.desktop
+usr/share/kwin/
+usr/share/locale/
+usr/share/qlogging-categories6/org_kde_kwin.categories
