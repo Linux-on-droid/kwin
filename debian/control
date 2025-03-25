@@ -91,7 +91,6 @@ Build-Depends: breeze-dev (>= 4:5.27.11~),
                qttools5-dev (>= 5.15.2~),
                qtwayland5-dev-tools,
                wayland-protocols (>= 1.31~),
-               xwayland (>= 2:22.1.7-1~),
                libhardware-dev,
                libhybris-dev,
 Standards-Version: 4.7.0
@@ -177,7 +176,6 @@ Package: kwin-wayland
 Architecture: any
 Depends: kwayland-integration (>= 5.26.11~),
          libcap2-bin [linux-any],
-         xwayland,
          ${misc:Depends},
          ${shlibs:Depends},
 Provides: kwin,
