@@ -4,62 +4,69 @@ Priority: optional
 Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
 Uploaders: Aurélien COUDERC <coucouf@debian.org>,
            Patrick Franz <deltaone@debian.org>,
-Build-Depends: breeze-dev (>= 4:5.27.11~),
+Build-Depends: debhelper-compat (= 13),
+               dh-sequence-kf6,
+               breeze-dev (>= 4:6.2.90~),
                cmake (>= 3.16~),
-               debhelper-compat (= 13),
-               dh-sequence-kf5,
-               dh-sequence-python3,
-               extra-cmake-modules (>= 5.102.0~),
+               extra-cmake-modules (>= 6.10.0~),
                gettext,
                hwdata,
-               kscreenlocker-dev (>= 5.26.11~),
+               kscreenlocker-dev (>= 6.2.90~),
+               kwayland-dev (>= 4:6.3.2~),
+               libcanberra-dev,
                libcap-dev [linux-any],
-               libdrm-dev (>= 2.4.112~),
+               libcap2-bin [linux-any],
+               libdisplay-info-dev,
+               libdrm-dev (>= 2.4.116~),
                libegl-dev (>= 1.2~),
+               libeis-dev,
                libepoxy-dev (>= 1.3),
                libfontconfig-dev,
                libfreetype-dev,
                libgbm-dev,
                libice-dev,
-               libinput-dev (>= 1.19~),
-               libkdecorations2-dev (>= 4:5.27.11~),
-               libkf5activities-dev (>= 5.102.0~),
-               libkf5auth-dev (>= 5.102.0~),
-               libkf5config-dev (>= 5.102.0~),
-               libkf5configwidgets-dev (>= 5.102.0~),
-               libkf5coreaddons-dev (>= 5.102.0~),
-               libkf5crash-dev (>= 5.102.0~),
-               libkf5dbusaddons-dev (>= 5.102.0~),
-               libkf5declarative-dev (>= 5.102.0~),
-               libkf5doctools-dev (>= 5.102.0~),
-               libkf5globalaccel-dev (>= 5.102.0~),
-               libkf5i18n-dev (>= 5.102.0~),
-               libkf5idletime-dev (>= 5.102.0~),
-               libkf5itemviews-dev (>= 5.102.0~),
-               libkf5kcmutils-dev (>= 5.102.0~),
-               libkf5newstuff-dev (>= 5.102.0~),
-               libkf5notifications-dev (>= 5.102.0~),
-               libkf5package-dev (>= 5.102.0~),
-               libkf5plasma-dev (>= 5.102.0~),
-               libkf5runner-dev (>= 5.102.0~),
-               libkf5service-dev (>= 5.102.0~),
-               libkf5wayland-dev (>= 4:5.102.0~),
-               libkf5widgetsaddons-dev (>= 5.102.0~),
-               libkf5windowsystem-dev (>= 5.102.0~),
-               libkf5xmlgui-dev (>= 5.102.0~),
+               libinput-dev (>= 1.26~),
+               libkdecorations3-dev (>= 4:6.3.2~),
+               libkf6auth-dev (>= 6.10.0~),
+               libkf6colorscheme-dev (>= 6.10.0~),
+               libkf6config-dev (>= 6.10.0~),
+               libkf6configwidgets-dev (>= 6.10.0~),
+               libkf6coreaddons-dev (>= 6.10.0~),
+               libkf6crash-dev (>= 6.10.0~),
+               libkf6dbusaddons-dev (>= 6.10.0~),
+               libkf6declarative-dev (>= 6.10.0~),
+               libkf6doctools-dev (>= 6.10.0~),
+               libkf6globalaccel-dev (>= 6.10.0~),
+               libkf6guiaddons-dev (>= 6.10.0~),
+               libkf6i18n-dev (>= 6.10.0~),
+               libkf6idletime-dev (>= 6.10.0~),
+               libkf6itemviews-dev (>= 6.2.0~),
+               libkf6kcmutils-dev (>= 6.10.0~),
+               libkf6newstuff-dev (>= 6.10.0~),
+               libkf6notifications-dev (>= 6.10.0~),
+               libkf6package-dev (>= 6.10.0~),
+               libkf6runner-dev (>= 6.2.0~),
+               libkf6service-dev (>= 6.10.0~),
+               libkf6svg-dev (>= 6.10.0~),
+               libkf6widgetsaddons-dev (>= 6.10.0~),
+               libkf6windowsystem-dev (>= 6.10.0~),
+               libkf6xmlgui-dev (>= 6.10.0~),
+               libkglobalacceld-dev (>= 6.2.90~),
+               libkirigami-dev (>= 6.10.0~),
                liblcms2-dev,
                libpipewire-0.3-dev (>= 0.3.29),
-               libqaccessibilityclient-qt5-dev,
-               libqt5waylandclient5-dev,
-               libqt5x11extras5-dev (>= 5.15.2~),
+               libplasma-dev (>= 6.3.2~),
+               libplasmaactivities-dev (>= 6.3.2~),
+               libqaccessibilityclient-qt6-dev,
                libsm-dev,
+               libsystemd-dev,
                libudev-dev [linux-any],
-               libwayland-dev (>= 1.20~),
+               libwayland-dev (>= 1.22~),
                libx11-xcb-dev,
                libxcb-composite0-dev (>= 1.10~),
                libxcb-cursor-dev,
                libxcb-damage0-dev (>= 1.10~),
-               libxcb-dri3-dev,
+               libxcb-dri3-dev (>= 1.10~),
                libxcb-glx0-dev (>= 1.10~),
                libxcb-icccm4-dev,
                libxcb-image0-dev,
@@ -73,27 +80,29 @@ Build-Depends: breeze-dev (>= 4:5.27.11~),
                libxcb-util-dev,
                libxcb-xfixes0-dev (>= 1.10~),
                libxcb-xinerama0-dev (>= 1.10~),
+               libxcb-xinput-dev (>= 1.10~),
                libxcb-xkb-dev (>= 1.10~),
                libxcb-xtest0-dev,
                libxcb1-dev (>= 1.10~),
                libxcursor-dev,
                libxcvt-dev (>= 0.1.1~),
-               libxi-dev,
                libxkbcommon-dev (>= 0.7.0~),
                libxkbcommon-x11-dev,
-               pkg-config,
-               pkg-kde-tools (>= 0.15.18~),
-               plasma-wayland-protocols (>= 1.9.0~),
-               python3:any,
-               qtbase5-dev (>= 5.15.2~),
-               qtbase5-private-dev,
-               qtdeclarative5-dev (>= 5.15.2~),
-               qttools5-dev (>= 5.15.2~),
-               qtwayland5-dev-tools,
-               wayland-protocols (>= 1.31~),
-               libhardware-dev,
-               libhybris-dev,
-Standards-Version: 4.7.0
+               pkgconf,
+               plasma-wayland-protocols (>= 1.14.0~),
+               qt6-5compat-dev (>= 6.7.0~),
+               qt6-base-dev (>= 6.7.0~),
+               qt6-base-private-dev (>= 6.6.0+dfsg~),
+               qt6-declarative-dev (>= 6.7.0~),
+               qt6-declarative-private-dev,
+               qt6-sensors-dev (>= 6.7.0~),
+               qt6-svg-dev (>= 6.7.0~),
+               qt6-tools-dev (>= 6.7.0~),
+               qt6-wayland-dev (>= 6.7.0~),
+               qt6-wayland-dev-tools,
+               wayland-protocols (>= 1.38~),
+               xwayland,
+Standards-Version: 4.7.2
 Homepage: https://projects.kde.org/projects/kde/workspace/kwin
 Vcs-Browser: https://salsa.debian.org/qt-kde-team/kde/kwin
 Vcs-Git: https://salsa.debian.org/qt-kde-team/kde/kwin.git
@@ -101,16 +110,21 @@ Rules-Requires-Root: no
 
 Package: kwin-common
 Architecture: any
-Depends: hwdata,
-         kwin-data,
-         libkf5globalaccel-bin,
-         qml-module-org-kde-kquickcontrolsaddons,
-         qml-module-qtmultimedia,
+Depends: kglobalacceld,
+         kwin-data (= ${source:Version}),
+         plasma-desktoptheme,
+         pnp.ids,
+         qml6-module-org-kde-kirigami,
+         qml6-module-org-kde-ksvg,
+         qml6-module-qt5compat-graphicaleffects,
+         qml6-module-qtquick,
+         qml6-module-qtquick-window,
          ${misc:Depends},
          ${shlibs:Depends},
-Recommends: libqt5multimedia5-plugins, plasma-desktop (>= 4:5.27.11~),
-Suggests: kwin-addons (>= 4:5.27.11~),
-Breaks: plasma-workspace (<< 4:5.14), plasma-workspace-dev (<< 4:5.14),
+Recommends: plasma-desktop (>= 4:6.2.90~),
+Suggests: kwin-addons (>= 4:6.2.90~),
+Breaks: kwin-data (<< 4:6.1.4-1),
+Replaces: kwin-data (<< 4:6.1.4-1),
 Description: KDE window manager, common files
  KWin (pronounced as one syllable "kwin") is the window
  manager for the KDE Plasma Desktop. It gives you complete
@@ -125,15 +139,22 @@ Description: KDE window manager, common files
 Package: kwin-data
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, ${python3:Depends},
-Recommends: plasma-framework,
-            qml-module-qtmultimedia,
-            qml-module-qtquick-controls,
-            qml-module-qtquick-layouts,
-            qml-module-qtquick-virtualkeyboard,
-            qml-module-qtquick-window2,
-            qml-module-qtquick2,
+Depends: ${misc:Depends},
+Recommends: plasma-desktoptheme,
+            qml6-module-org-kde-kirigami,
+            qml6-module-org-kde-kitemmodels,
+            qml6-module-org-kde-kquickcontrolsaddons,
+            qml6-module-org-kde-ksvg,
+            qml6-module-org-kde-quickcharts,
+            qml6-module-qt5compat-graphicaleffects,
+            qml6-module-qtmultimedia,
+            qml6-module-qtquick,
+            qml6-module-qtquick-controls,
+            qml6-module-qtquick-layouts,
+            qml6-module-qtquick-window,
             systemsettings,
+Breaks: kwin-addons (<< 4:6.0.0~),
+Replaces: kwin-addons (<< 4:6.0.0~),
 Description: KDE window manager data files
  KWin (pronounced as one syllable "kwin") is the window
  manager for the KDE Plasma Desktop. It gives you complete
@@ -149,18 +170,14 @@ Package: kwin-dev
 Section: libdevel
 Architecture: any
 Depends: kwin-common (= ${binary:Version}),
-         libegl-dev (>= 1.2~),
          libepoxy-dev (>= 1.3),
-         libkf5config-dev (>= 5.102.0~),
-         libkf5coreaddons-dev (>= 5.102.0~),
-         libkf5windowsystem-dev (>= 5.102.0~),
-         libqt5x11extras5-dev (>= 5.15.2~),
-         libxcb-xfixes0-dev (>= 1.10~),
-         qtbase5-dev (>= 5.15.2~),
+         libkf6config-dev (>= 6.10.0~),
+         libkf6coreaddons-dev (>= 6.10.0~),
+         libkf6windowsystem-dev (>= 6.10.0~),
+         libkwin6 (= ${binary:Version}),
+         qt6-base-dev (>= 6.7.0~),
+         qt6-declarative-dev (>= 6.7.0~),
          ${misc:Depends},
-         ${shlibs:Depends},
-Breaks: kde-workspace-dev,
-Replaces: kde-workspace-dev,
 Description: KDE window manager - devel files
  KWin (pronounced as one syllable "kwin") is the window
  manager for the KDE Plasma Desktop. It gives you complete
@@ -174,12 +191,10 @@ Description: KDE window manager - devel files
 
 Package: kwin-wayland
 Architecture: any
-Depends: kwayland-integration (>= 5.26.11~),
-         libcap2-bin [linux-any],
-         ${misc:Depends},
-         ${shlibs:Depends},
+Depends: libcap2-bin [linux-any], xwayland, ${misc:Depends}, ${shlibs:Depends},
+Recommends: xwaylandvideobridge,
 Provides: kwin,
-Description: KDE window manager, wayland version, PREVIEW release
+Description: KDE window manager, Wayland version
  KWin (pronounced as one syllable "kwin") is the window
  manager for the KDE Plasma Desktop. It gives you complete
  control over your windows, making sure they're not in the way
@@ -191,12 +206,10 @@ Description: KDE window manager, wayland version, PREVIEW release
  This package provides the wayland version, which is still a work in progress
  project, and is available as a PREVIEW release. Don't expect the same
  stability as with the x11 version.
-Breaks: plasma-workspace-wayland (<< 4:5.14),
 
 Package: kwin-x11
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends},
-Breaks: kwin-addons (<< 4:5.14),
 Provides: kwin, x-window-manager,
 Description: KDE window manager, X11 version
  KWin (pronounced as one syllable "kwin") is the window
@@ -209,30 +222,11 @@ Description: KDE window manager, X11 version
  .
  This package is part of the KDE base workspace module.
 
-Package: libkwineffects14
+Package: libkwin6
 Section: libs
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends},
-Breaks: libkwin4-effect-builtins1, libkwineffects13,
-Replaces: libkwineffects13,
-Description: KDE window manager effects library
- KWin (pronounced as one syllable "kwin") is the window
- manager for the KDE Plasma Desktop. It gives you complete
- control over your windows, making sure they're not in the way
- but aid you in your task. It paints the window decoration,
- the bar on top of every window with (configurable) buttons
- like close, maximize and minimize. It also handles placing
- of windows and switching between them.
- .
- This package is part of the KDE base workspace module.
-
-Package: libkwinglutils14
-Section: libs
-Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends},
-Breaks: libkwin4-effect-builtins1, libkwinglutils13,
-Replaces: libkwinglutils13,
-Description: KDE window manager gl utils library
+Description: KDE window manager library
  KWin (pronounced as one syllable "kwin") is the window
  manager for the KDE Plasma Desktop. It gives you complete
  control over your windows, making sure they're not in the way

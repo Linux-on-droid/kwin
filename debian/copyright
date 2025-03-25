@@ -4,102 +4,390 @@ Source: git://anongit.kde.org/kwin
 Upstream-Contact: plasma-devel@kde.org
 
 Files: *
-Copyright: 2010, Alexandre Pereira <pereira.alex@gmail.com>
-           2019-2020, Aleix Pol Gonzalez <aleixpol@kde.org>
+Copyright: 2020, <davidedmundson@kde.org>
+           2019-2024, Aleix Pol Gonzalez <aleixpol@kde.org>
+           2024, Aleix Pol i Gonzalez <aleix.pol_gonzalez@mbition.io>
            2018, Alex Nemeth <alex.nemeth329@gmail.com>
+           2022, Alex Richardson <arichardson.kde@gmail.com>
            2010, Alexandre Pereira <pereira.alex@gmail.com>
+           2023, Andrew Shark <ashark at linuxcomp.ru>
            2013, Antonis Tsiapaliokas <kok3rs@gmail.com>
+           2022, Arjen Hiemstra <ahiemstra@heimr.nl>
            2011, Arthur Arlt <a.arlt@stud.uni-heidelberg.de>
            2020, Benjamin Port <benjamin.port@enioka.com>
            2020, Carson Black <uhhadd@gmail.com>
-           2007, Christian Nitschkowski <christian.nitschkowski@kdemail.net>
+           2020, Chris Holland <zrenfire@gmail.com>
            2007, Christian Nitschkowski <christian.nitschkowski@kdemail.net>
            1997-2002, Cristian Tibirna <tibirna@kde.org>
-           2020, Cyril Rossi <cyril.rossi@enioka.com>
+           2020-2021, Cyril Rossi <cyril.rossi@enioka.com>
            2011-2012, Cédric Bellegarde <gnumdk@gmail.com>
            2008, Cédric Borgese <cedric.borgese@gmail.com>
-           2018-2021, David Edmundson <davidedmundson@kde.org>
+           2018-2024, David Edmundson <davidedmundson@kde.org>
            2017, David Edmundson <kde@davidedmundson.co.uk>
-           2020, David Redondo <kde@david-redondo.de>
-           2017, Demitrius Belai <demitriusbelai@gmail.com>
+           2020-2021, David Redondo <kde@david-redondo.de>
            2018, Eike Hein <hein@kde.org>
            2012, Filip Wieladek <wattos@gmail.com>
-           2009-2018, Fredrik Höglund <fredrik@kde.org>
+           2010-2014, Fredrik Höglund <fredrik@kde.org>
+           2023, Fushan Wen <qydwhotmail@gmail.com>
+           2023, Harald Sitter <sitter@kde.org>
            2020, Henri Chain <henri.chain@enioka.com>
            2014, Hugo Pereira Da Costa <hugo.pereira@free.fr>
-           2020, Ismael Asensio <isma.af@gmail.com>
+           2021-2023, Ismael Asensio <isma.af@gmail.com>
+           2022-2023, ivan tkachenko <me@ratijas.tk>
+           2024, Jin Liu <m.liu.jin@gmail.com>
            2010, Jorge Mata <matamax123@gmail.com>
+           2023, Kai Uwe Broulik <kde@broulik.de>
            2017, Kai Uwe Broulik <kde@privat.broulik.de>
-           2003, Karol Szwed <kszwed@kde.org>
            2008, Kristian Høgsberg
            2018, Laurent Montel <montel@kde.org>
            2011, Lionel Chauvin <megabigbug@yahoo.fr>
            2001-2008, Lubos Lunak <l.lunak@kde.org>
            2008, Lubos Lunak <l.lunak@suse.cz>
            2008-2009, Lucas Murray <lmurray@undefinedfire.com>
-           2014-2020, Marco Martin <mart@kde.org>
-           2009, Marco Martin <notmart@gmail.com>
+           2014-2024, Marco Martin <mart@kde.org>
+           2009, Marco Martin notmart @gmail.com
            2015-2019, Martin Flöser <mgraesslin@kde.org>
-           2008-2011, Martin Gräßlin <kde@martin-graesslin.com>
+           2009, Martin Gräßlin <kde@martin-graesslin.com>
            2012, Martin Gräßlin <m.graesslin@kde.org>
            2008-2017, Martin Gräßlin <mgraesslin@kde.org>
            1998-2000, Matthias Ettrich <ettrich@kde.org>
+           2022, MBition GmbH
            2009, Michael Zanetti <michael_zanetti@gmx.net>
            2015, Mika Allan Rauhala <mika.allan.rauhala@gmail.com>
+           2020-2021, Méven Car <meven.car@enioka.com>
+           2022-2023, Natalie Clarius <natalie_clarius@yahoo.de>
+           2023, Nate Graham <nate@kde.org>
+           2023, Niccolò Venerandi <niccolo@venerandi.com>
+           2023, Nicolas Fella <nicolas.fella@gmx.de>
+           2024, Nicolas Fella <nicolas.fella@kdab.com>
+           2010, Nokia Corporation and /or its subsidiary(-ies)
            2011, NVIDIA Corporation
-           2019, NVIDIA Inc.
-           2010, Nokia Corporation and/or its subsidiary(-ies)
            1997, Patrick Dowler <dowler@morgul.fsh.uvic.ca>
            2007, Philip Falkner <philip.falkner@gmail.com>
            2011-2012, Philipp Knechtges <philipp-dev@knechtges.com>
            2001, Rik Hemsley (rikkus) <rik@kde.org>
            2006-2007, Rivo Laks <rivolaks@hot.ee>
            2010, Rohan Prabhu <rohan@rohanprabhu.com>
-           2016-2020, Roman Gilg <subdiff@gmail.com>
+           2016-2019, Roman Gilg <subdiff@gmail.com>
            2003-2005, Sandro Giessl <sandro@giessl.com>
            2010, Sebastian Sauer <sebsauer@kdab.com>
            2011, Tamas Krutki <ktamasw@gmail.com>
            2014-2015, Thomas Lübking <thomas.luebking@gmail.com>
-           2010-2011, Thomas Lübking <thomas.luebking@web.de>
+           2011, Thomas Lübking <thomas.luebking@web.de>
+           2017-2025, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
            2001, Waldo Bastian <bastian@kde.org>
-           2020, Xaver Hugl <xaver.hugl@gmail.com>
-           2002-2018, Free Software Foundation
-           1997-2018, Free Software Foundation, Inc
-           2000, Jesús Bravo Álvarez
-           2008-2009, K Desktop Environment
-           1998, KDE Russian translation Team
-           2000-2001, KDE Team
-           2000-2002, KDE e.v.
-           2007, KDE i18n Project for Vietnamese
-           1999-2002, Meni Livne <livne@kde.org>
-           2009-2012, Rosetta Contributors and Canonical Ltd
-           2002-2021, This_file_is_part_of_KDE
-           2001, translate.org.za
-License: GPL-2+
+           2020-0, Xaver Hugl <xaver.hugl@gmail.com>
+           2023, Xaver Hugl <xaver.hugl@kde.org>
+           2024, Yifan Zhu <fanzhuyifan@gmail.com>
+License: GPL-2.0-or-later
+
+Files: po/*
+Copyright: 2021-2024, A S Alam <aalam@satluj.org>
+           2007-2024, A S Alam <aalam@users.sf.net>
+           2018-2024, Adrian Chaves <adrian@chaves.io>
+           2023-2025, Adrián Chaves (Gallaecio)
+           2018-2024, Alexander Yavorsky <kekcuha@gmail.com>
+           2013-2024, Antoni Bella Pérez <antonibella5@yahoo.com>
+           2012-2024, Antonis Geralis <capoiosct@gmail.com>
+           1999-2000, Boris Wesslowski <Boris@Wesslowski.com>
+           2010-2011, Cristina Yenyxe González García <the.blue.valkyrie@gmail.com>
+           2005-2024, Eloy Cuadra <ecuadra@eloihr.net>
+           2022-2025, Emir SARI <emir_sari@icloud.com>
+           2022-2024, Enol P. <enolp@softastur.org>
+           2007-2008, Enrique Matias Sanchez (aka Quique) <cronopios@gmail.com>
+           2024, Flori G <Renner03@protonmail.com>
+           2024, Flori G <renner03@protonmail.com>
+           2009-2024, Freek de Kruijf <f.de.kruijf@hetnet.nl>
+           2009-2024, Freek de Kruijf <freekdekruijf@kde.nl>
+           2010-2024, g.sora <g.sora@tiscali.it>
+           2023-2025, Geraldo Simiao <geraldosimiao@fedoraproject.org>
+           2012-2024, Giovanni Sora <g.sora@tiscali.it>
+           2024, Guilherme Marcal Silva <guimarcalsilva@gmail.com>
+           2025, Guilherme Marçal Silva <guimarcalsilva@gmail.com>
+           2022-2024, Gummi <gudmundure@gmail.com>
+           2022-2024, gummi <gudmundure@gmail.com>
+           2022-2024, Guðmundur Erlingsson <gudmundure@gmail.com>
+           2003-2009, Jaime Robles <jaime@kde.org>
+           2024, Janet Blackquill <uhhadd@gmail.com>
+           2011-2012, Javier Vinal <fjvinal@gmail.com>
+           2009-2023, Johannes Obermayr <johannesobermayr@gmx.de>
+           2001-2024, Josep M. Ferrer <txemaq@gmail.com>
+           2005, Juan Manuel Garcia Molina <juanma@superiodico.net>
+           2005-2024, Jure Repinc <jlp@holodeck1.com>
+           2024, kali <shreekantkalwar@gmail.com>
+           2024, kali <skkalwar999@gmail.com>
+           2023-2024, KDE euskaratzeko proiektuko arduraduna <xalba@ni.eus>
+           2022-2025, Kisaragi Hiu <mail@kisaragi-hiu.com>
+           2021-2025, Kishore G <kishore96@gmail.com>
+           2021-2025, Kristof Kiszel <kiszel.kristof@gmail.com>
+           2021-2025, Kristof Kiszel <ulysses@fsf.hu>
+           2023, Linerly <linerly@linerly.xyz>
+           2025, Lucia Mrenica <lucia.mrenica@gmail.com>
+           2019-2023, Matej Mrenica <matejm98mthw@gmail.com>
+           2003-2004, Miguel Revilla Rodríguez <yo@miguelrevilla.com>
+           2022-2024, Mincho Kondarev <mkondarev@yahoo.de>
+           2024, Nicolai Weitkemper <kontakt@nicolaiweitkemper.de>
+           2018-2024, Olesya Gerasimenko <gammaray@basealt.ru>
+           2022-2024, Olesya Gerasimenko <translation-team@basealt.ru>
+           2004, Pablo de Vicente <p.devicente@wanadoo.es>
+           2006, Pablo de Vicente <pablo.devicente@gmail.com>
+           2001-2003, Pablo de Vicente <vicente@oan.es>
+           2003, Pablo de Vicente <vicnte@oan.es>
+           2016-2025, Paolo Zamponi <feus73@gmail.com>
+           2024, R. Arp <rarp@7bps.de>
+           2024, rasmus rosendahl-kaa <rasmus@rosendahl-kaa.name>
+           2013, Rocío Gallego <traducciones@rociogallego.com>
+           2013-2023, Roman Paholík <wizzardsk@gmail.com>
+           2023-2024, Ryuichi Yamada <ryuichi_ya220@outlook.jp>
+           2005, Santiago Fernandez Sancho <santi@kde-es.org>
+           2007-2024, Shinjo Park <kde@peremen.name>
+           2012-2024, Stefan Asserhall <stefan.asserhall@gmail.com>
+           2002-2025, Stefan Asserhäll <stefan.asserhall@gmail.com>
+           2014-2024, Steve Allewell <steve.allewell@gmail.com>
+           2009-2025, Tommi Nieminen <translator@legisign.org>
+           2024-2025, Toms Trasuns <toms.trasuns@posteo.net>
+           2014-2024, Vincenzo Reale <smart2128vr@gmail.com>
+           2017-2024, Vit Pelcak <vit@pelcak.org>
+           2010-2024, Vít Pelčák <vit@pelcak.org>
+           2017-2024, Wantoyo <wantoyek@gmail.com>
+           2013-2025, Xavier Besnard <xavier.besnard@kde.org>
+           2023-2024, Yaron Shahrabani <sh.yaron@gmail.com>
+           2008-2024, zayed <zayed.alsaidi@gmail.com>
+           2009-2025, Zayed Al-Saidi <zayed.alsaidi@gmail.com>
+           2011-2025, Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>
+License: GPL-2.0-or-later
+
+Files: src/plugins/kpackage/CMakeLists.txt
+Copyright: 2023, Alexander Lohnau <alexander.lohnau@gmx.de>
+License: BSD-2-Clause
+
+Files: cmake/modules/Findgbm.cmake
+       cmake/modules/Findhwdata.cmake
+       cmake/modules/Findlcms2.cmake
+       cmake/modules/FindLibcap.cmake
+       cmake/modules/FindLibdrm.cmake
+       cmake/modules/FindLibeis-1.0.cmake
+       cmake/modules/FindXKB.cmake
+       cmake/modules/FindXwayland.cmake
+       src/kcms/virtualkeyboard/CMakeLists.txt
+       src/kcms/xwayland/CMakeLists.txt
+       src/plugins/bouncekeys/CMakeLists.txt
+       src/plugins/buttonrebinds/CMakeLists.txt
+       src/plugins/colorblindnesscorrection/CMakeLists.txt
+       src/plugins/eis/CMakeLists.txt
+       src/plugins/keynotification/CMakeLists.txt
+       src/plugins/outputlocator/CMakeLists.txt
+       src/plugins/overview/CMakeLists.txt
+       src/plugins/overview/kcm/CMakeLists.txt
+       src/plugins/private/CMakeLists.txt
+       src/plugins/showcompositing/CMakeLists.txt
+       src/plugins/showfps/CMakeLists.txt
+       src/plugins/stickykeys/CMakeLists.txt
+       src/plugins/tileseditor/CMakeLists.txt
+       src/plugins/tileseditor/kcm/CMakeLists.txt
+       src/plugins/windowview/CMakeLists.txt
+       src/plugins/windowview/kcm/CMakeLists.txt
+       src/tabbox/switchers/CMakeLists.txt
+Copyright: 2020, Aleix Pol Gonzalzez <aleixpol@kde.org>
+           2014, Alex Merry <alex.merry@kde.org>
+           2022, Arjen Hiemstra <ahiemstra@heimr.nl>
+           2020, Daniel Vrátil <dvratil@kde.org>
+           2022, David Redondo <kde@david-redondo.de>
+           2022-2024, David Redondo <kde@david-redono.de>
+           2023, Fushan Wen <qydwhotmail@gmail.com>
+           2014, Hrvoje Senjan <hrvoje.senjan@gmail.com>
+           2022, Marco Martin <mart@kde.org>
+           2014-2016, Martin Gräßlin <mgraesslin@kde.org>
+           2023, Nate Graham <nate@kde.org>
+           2022-2023, Nicolas Fella <nicolas.fella@gmx.de>
+           2024, Nicolas Fella <nicolas.fella@kdab.com>
+           2020-2021, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+           2024, Xaver Hugl <xaver.hugl@gmail.com>
+License: BSD-3-Clause
+
+Files: examples/plugin/CMakeLists.txt
+       examples/plugin/metadata.json
+       examples/quick-effect/CMakeLists.txt
+       examples/quick-effect/package/contents/config/main.xml
+       examples/quick-effect/package/contents/ui/config.ui
+       examples/quick-effect/package/metadata.json
+       examples/quick-script/CMakeLists.txt
+       examples/quick-script/package/metadata.json
+       .gitlab-ci.yml
+       .kde-ci.yml
+       src/plugins/colorblindnesscorrection/metadata.json
+       src/plugins/colorblindnesscorrection/shaders/colorblindnesscorrection_core.frag
+       src/plugins/colorblindnesscorrection/shaders/colorblindnesscorrection.frag
+       src/plugins/overview/overviewconfig.kcfgc
+       src/plugins/shakecursor/shakecursorconfig.kcfgc
+       src/plugins/windowview/windowviewconfig.kcfgc
+Copyright: None
+           2021, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+License: CC0-1.0
+Comment: Some files specify "SPDX-FileCopyrightText: None".
 
 Files: autotests/integration/dbus_interface_test.cpp
+       autotests/integration/input_capture_test.cpp
        autotests/onscreennotificationtest.cpp
        autotests/onscreennotificationtest.h
+       examples/plugin/eventlistener.cpp
+       examples/plugin/eventlistener.h
+       kconf_update/CMakeLists.txt
+       kconf_update/kwin.upd
+       src/kcms/decoration/declarative-plugin/buttonsmodel.cpp
+       src/kcms/decoration/declarative-plugin/buttonsmodel.h
+       src/kcms/decoration/declarative-plugin/previewbridge.cpp
+       src/kcms/decoration/declarative-plugin/previewbridge.h
+       src/kcms/decoration/declarative-plugin/previewbutton.cpp
+       src/kcms/decoration/declarative-plugin/previewbutton.h
+       src/kcms/decoration/declarative-plugin/previewclient.cpp
+       src/kcms/decoration/declarative-plugin/previewclient.h
+       src/kcms/decoration/declarative-plugin/previewitem.cpp
+       src/kcms/decoration/declarative-plugin/previewitem.h
+       src/kcms/decoration/declarative-plugin/previewsettings.cpp
+       src/kcms/decoration/declarative-plugin/previewsettings.h
+       src/kcms/decoration/declarative-plugin/types.h
+       src/kcms/decoration/decorationmodel.cpp
+       src/kcms/decoration/decorationmodel.h
+       src/kcms/decoration/kwin-applywindowdecoration.cpp
+       src/kcms/decoration/ui/ButtonGroup.qml
+       src/kcms/decoration/ui/Buttons.qml
+       src/kcms/decoration/ui/Themes.qml
+       src/kcms/rules/kcmrules.cpp
+       src/kcms/rules/kcmrules.h
+       src/kcms/rules/optionsmodel.cpp
+       src/kcms/rules/optionsmodel.h
+       src/kcms/rules/rulebookmodel.cpp
+       src/kcms/rules/rulebookmodel.h
+       src/kcms/rules/ruleitem.cpp
+       src/kcms/rules/ruleitem.h
+       src/kcms/rules/rulesmodel.cpp
+       src/kcms/rules/rulesmodel.h
+       src/kcms/rules/ui/FileDialogLoader.qml
+       src/kcms/rules/ui/main.qml
+       src/kcms/rules/ui/OptionsComboBox.qml
+       src/kcms/rules/ui/RuleItemDelegate.qml
+       src/kcms/rules/ui/RulesEditor.qml
+       src/kcms/rules/ui/ValueEditor.qml
+       src/kcms/virtualkeyboard/ui/main.qml
+       src/kcms/xwayland/ui/main.qml
+       src/mousebuttons.cpp
+       src/mousebuttons.h
+       src/onscreennotification.cpp
+       src/onscreennotification.h
+       src/osd.cpp
+       src/osd.h
+       src/plugins/bouncekeys/bouncekeys.cpp
+       src/plugins/bouncekeys/bouncekeys.h
+       src/plugins/bouncekeys/main.cpp
+       src/plugins/buttonrebinds/buttonrebindsfilter.cpp
+       src/plugins/buttonrebinds/buttonrebindsfilter.h
+       src/plugins/buttonrebinds/main.cpp
+       src/plugins/eis/eisbackend.cpp
+       src/plugins/eis/eisbackend.h
+       src/plugins/eis/eiscontext.cpp
+       src/plugins/eis/eiscontext.h
+       src/plugins/eis/eisdevice.cpp
+       src/plugins/eis/eisdevice.h
+       src/plugins/eis/eisinputcapture.cpp
+       src/plugins/eis/eisinputcapturefilter.cpp
+       src/plugins/eis/eisinputcapturefilter.h
+       src/plugins/eis/eisinputcapture.h
+       src/plugins/eis/eisinputcapturemanager.cpp
+       src/plugins/eis/eisinputcapturemanager.h
+       src/plugins/eis/eisplugin.cpp
+       src/plugins/eis/eisplugin.h
+       src/plugins/eis/main.cpp
+       src/plugins/keynotification/keynotification.cpp
+       src/plugins/keynotification/keynotification.h
+       src/plugins/keynotification/main.cpp
+       src/plugins/outputlocator/main.cpp
+       src/plugins/outputlocator/outputlocator.cpp
+       src/plugins/outputlocator/outputlocator.h
+       src/plugins/stickykeys/main.cpp
+       src/plugins/stickykeys/stickykeys.cpp
+       src/plugins/stickykeys/stickykeys.h
+       src/plugins/windowsystem/plugin.cpp
+       src/plugins/windowsystem/plugin.h
+       src/plugins/windowsystem/windoweffects.cpp
+       src/plugins/windowsystem/windoweffects.h
+       src/plugins/windowsystem/windowshadow.cpp
+       src/plugins/windowsystem/windowshadow.h
+       src/plugins/windowsystem/windowsystem.cpp
+       src/plugins/windowsystem/windowsystem.h
+       src/popup_input_filter.cpp
+       src/popup_input_filter.h
+       src/qml/onscreennotification/plasma/main.qml
+       src/qml/outline/plasma/outline.qml
+       src/tabletmodemanager.cpp
+       src/tabletmodemanager.h
+       src/xwayland/datasource.cpp
+       src/xwayland/datasource.h
        tests/cursorhotspottest.cpp
+       tests/lockscreenoverlaytest.cpp
        tests/normalhintsbasesizetest.cpp
        tests/pointergesturestest.cpp
        tests/pointergesturestest.qml
        tests/screenedgeshowtest.cpp
        tests/unmapdestroytest.qml
        tests/x11shadowreader.cpp
-Copyright: 2020, Ismael Asensio <isma.af@gmail.com>
+       tests/xdgactivationtest-qt6.cpp
+Copyright: 2020-2022, Aleix Pol Gonzalez <aleixpol@kde.org>
+           2021, Dan Leinir Turthra Jensen <admin@leinir.dk>
+           2021-2022, David Redondo <kde@david-redondo.de>
+           2024, David Redondo <kde@david-redondo>
+           2022-2024, David Redondo <kde@david-redono.de>
+           2022-2023, Harald Sitter <sitter@kde.org>
+           2022, Ilya Fedin <fedin-ilja2010@ya.ru>
+           2020, Ismael Asensio <isma.af@gmail.com>
            2017, Kai Uwe Broulik <kde@privat.broulik.de>
            2004, Lubos Lunak <l.lunak@kde.org>
            2018, Marco Martin <mart@kde.org>
            2017-2019, Martin Flöser <mgraesslin@kde.org>
            2016-2017, Martin Graesslin <mgraesslin@kde.org>
            2014-2016, Martin Gräßlin <mgraesslin@kde.org>
+           2023, Niccolò Venerandi <niccolo.venerandi@kde.org>
+           2022-2024, Nicolas Fella <nicolas.fella@gmx.de>
+           2024, Nicolas Fella <nicolas.fella@kdab.com>
            2019, Valerio Pilo <vpilo@coldshock.net>
-           2020, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
-License: GPL-2+3+KDEeV
+           2020-2024, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+License: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
 
-Files: autotests/test_ftrace.cpp
-Copyright: 2020, Aleix Pol Gonzalez <aleixpol@kde.org>
+Files: src/kcms/decoration/kcm.cpp
+       src/kcms/decoration/kcm.h
+       src/kcms/decoration/ui/ConfigureTitlebar.qml
+       src/kcms/decoration/ui/main.qml
+       src/kcms/decoration/utils.cpp
+       src/kcms/decoration/utils.h
+Copyright: 2019, Cyril Rossi <cyril.rossi@enioka.com>
+           2023, Joshua Goins <josh@redstrate.com>
+           2019, Valerio Pilo <vpilo@coldshock.net>
+License: LGPL-2.0-only
+
+Files: autotests/output_transform_test.cpp
+       autotests/test_colorspaces.cpp
+       autotests/test_ftrace.cpp
+       examples/plugin/main.cpp
+       src/ftrace.cpp
+       src/ftrace.h
+       src/kcms/desktop/ui/main.qml
+       src/kcms/screenedges/screenpreviewwidget.cpp
+       src/kcms/screenedges/screenpreviewwidget.h
+       src/plugins/kpackage/aurorae/aurorae.cpp
+       src/plugins/kpackage/decoration/decoration.cpp
+       src/plugins/kpackage/effect/effect.cpp
+       src/plugins/kpackage/scripts/scripts.cpp
+       src/plugins/kpackage/windowswitcher/windowswitcher.cpp
+       src/plugins/nightlight/main.cpp
+       src/plugins/screencast/main.cpp
+       src/plugins/screencast/pipewirecore.cpp
+       src/plugins/screencast/pipewirecore.h
+       src/plugins/screencast/screencastmanager.cpp
+       src/plugins/screencast/screencastmanager.h
+       src/plugins/screencast/screencaststream.cpp
+       src/plugins/screencast/screencaststream.h
+       src/plugins/screencast/screencastutils.h
+Copyright: 2020-2021, Aleix Pol Gonzalez <aleixpol@kde.org>
            2021, David Edmundson <davidedmundson@kde.org>
            2017, Demitrius Belai <demitriusbelai@gmail.com>
            2018, Eike Hein <hein@kde.org>
@@ -107,164 +395,628 @@ Copyright: 2020, Aleix Pol Gonzalez <aleixpol@kde.org>
            2009, Marco Martin <notmart@gmail.com>
            2018-2020, Red Hat Inc
            2020, Roman Gilg <subdiff@gmail.com>
-           2018-2020, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
-License: LGPL-2+
+           2018-2024, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+           2023, Xaver Hugl <xaver.hugl@gmail.com>
+License: LGPL-2.0-or-later
 
-Files: cmake/*
-Copyright: 2014, Alex Merry <alex.merry@kde.org>
-           2020, Daniel Vrátil <dvratil@kde.org>
-           2014, Hrvoje Senjan <hrvoje.senjan@gmail.com>
-           2014-2016, Martin Gräßlin <mgraesslin@kde.org>
-           2020, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
-License: BSD-3-clause
-
-Files: po/ca/*
-       po/ca@valencia/*
-       po/uk/*
-Copyright: 1998-2021, This_file_is_part_of_KDE
-License: LGPL-2.1+3+KDEeV-translations
-
-Files: tests/pointerconstraintstest.cpp
+Files: autotests/wayland/client/test_datadevice.cpp
+       autotests/wayland/client/test_datasource.cpp
+       autotests/wayland/client/test_drag_drop.cpp
+       autotests/wayland/client/test_error.cpp
+       autotests/wayland/client/test_plasma_activities.cpp
+       autotests/wayland/client/test_plasmashell.cpp
+       autotests/wayland/client/test_plasma_virtual_desktop.cpp
+       autotests/wayland/client/test_pointer_constraints.cpp
+       autotests/wayland/client/test_selection.cpp
+       autotests/wayland/client/test_server_side_decoration.cpp
+       autotests/wayland/client/test_server_side_decoration_palette.cpp
+       autotests/wayland/client/test_shadow.cpp
+       autotests/wayland/client/test_shm_pool.cpp
+       autotests/wayland/client/test_text_input_v2.cpp
+       autotests/wayland/client/test_wayland_appmenu.cpp
+       autotests/wayland/client/test_wayland_blur.cpp
+       autotests/wayland/client/test_wayland_contrast.cpp
+       autotests/wayland/client/test_wayland_filter.cpp
+       autotests/wayland/client/test_wayland_output.cpp
+       autotests/wayland/client/test_wayland_seat.cpp
+       autotests/wayland/client/test_wayland_slide.cpp
+       autotests/wayland/client/test_wayland_subsurface.cpp
+       autotests/wayland/client/test_wayland_surface.cpp
+       autotests/wayland/client/test_wayland_windowmanagement.cpp
+       autotests/wayland/client/test_xdg_decoration.cpp
+       autotests/wayland/client/test_xdg_foreign.cpp
+       autotests/wayland/client/test_xdg_output.cpp
+       autotests/wayland/client/test_xdg_shell.cpp
+       autotests/wayland/server/test_datacontrol_interface.cpp
+       autotests/wayland/server/test_display.cpp
+       autotests/wayland/server/test_inputmethod_interface.cpp
+       autotests/wayland/server/test_keyboard_shortcuts_inhibitor_interface.cpp
+       autotests/wayland/server/test_layershellv1_interface.cpp
+       autotests/wayland/server/test_no_xdg_runtime_dir.cpp
+       autotests/wayland/server/test_screencast.cpp
+       autotests/wayland/server/test_seat.cpp
+       autotests/wayland/server/test_tablet_interface.cpp
+       autotests/wayland/server/test_textinputv1_interface.cpp
+       autotests/wayland/server/test_textinputv3_interface.cpp
+       autotests/wayland/server/test_viewporter_interface.cpp
+       src/plugins/overview/kcm/overvieweffectkcm.ui
+       src/plugins/overview/overviewconfig.kcfg
+       src/plugins/screenshot/org.kde.KWin.ScreenShot2.xml
+       src/plugins/windowview/kcm/windowvieweffectkcm.ui
+       src/plugins/windowview/org.kde.KWin.Effect.WindowView1.xml
+       src/plugins/windowview/windowviewconfig.kcfg
+       src/utils/executable_path.h
+       src/utils/executable_path_proc.cpp
+       src/utils/executable_path_sysctl.cpp
+       src/utils/resource.h
+       src/wayland/abstract_data_source.cpp
+       src/wayland/abstract_data_source.h
+       src/wayland/abstract_drop_handler.cpp
+       src/wayland/abstract_drop_handler.h
+       src/wayland/alphamodifier_v1.cpp
+       src/wayland/alphamodifier_v1.h
+       src/wayland/appmenu.cpp
+       src/wayland/appmenu.h
+       src/wayland/blur.cpp
+       src/wayland/blur.h
+       src/wayland/clientconnection.cpp
+       src/wayland/clientconnection.h
+       src/wayland/colormanagement_v1.cpp
+       src/wayland/colormanagement_v1.h
+       src/wayland/compositor.cpp
+       src/wayland/compositor.h
+       src/wayland/contenttype_v1.cpp
+       src/wayland/contenttype_v1.h
+       src/wayland/contrast.cpp
+       src/wayland/contrast.h
+       src/wayland/cursorshape_v1.cpp
+       src/wayland/cursorshape_v1.h
+       src/wayland/datacontroldevicemanager_v1.cpp
+       src/wayland/datacontroldevicemanager_v1.h
+       src/wayland/datacontroldevice_v1.cpp
+       src/wayland/datacontroldevice_v1.h
+       src/wayland/datacontroloffer_v1.cpp
+       src/wayland/datacontroloffer_v1.h
+       src/wayland/datacontrolsource_v1.cpp
+       src/wayland/datacontrolsource_v1.h
+       src/wayland/datadevice.cpp
+       src/wayland/datadevice.h
+       src/wayland/datadevicemanager.cpp
+       src/wayland/datadevicemanager.h
+       src/wayland/datadevice_p.h
+       src/wayland/dataoffer.cpp
+       src/wayland/dataoffer.h
+       src/wayland/datasource.cpp
+       src/wayland/datasource.h
+       src/wayland/datasource_p.h
+       src/wayland/display.cpp
+       src/wayland/display.h
+       src/wayland/display_p.h
+       src/wayland/dpms.cpp
+       src/wayland/dpms.h
+       src/wayland/drmclientbuffer.cpp
+       src/wayland/drmclientbuffer.h
+       src/wayland/drmlease_v1.cpp
+       src/wayland/drmlease_v1.h
+       src/wayland/drmlease_v1_p.h
+       src/wayland/externalbrightness_v1.cpp
+       src/wayland/externalbrightness_v1.h
+       src/wayland/filtered_display.cpp
+       src/wayland/filtered_display.h
+       src/wayland/fixes.cpp
+       src/wayland/fixes.h
+       src/wayland/fractionalscale_v1.cpp
+       src/wayland/fractionalscale_v1.h
+       src/wayland/fractionalscale_v1_p.h
+       src/wayland/frog_colormanagement_v1.cpp
+       src/wayland/frog_colormanagement_v1.h
+       src/wayland/idle.cpp
+       src/wayland/idle.h
+       src/wayland/idleinhibit_v1.cpp
+       src/wayland/idleinhibit_v1.h
+       src/wayland/idleinhibit_v1_p.h
+       src/wayland/idlenotify_v1.cpp
+       src/wayland/idlenotify_v1.h
+       src/wayland/idle_p.h
+       src/wayland/inputmethod_v1.cpp
+       src/wayland/inputmethod_v1.h
+       src/wayland/keyboard.cpp
+       src/wayland/keyboard.h
+       src/wayland/keyboard_p.h
+       src/wayland/keyboard_shortcuts_inhibit_v1.cpp
+       src/wayland/keyboard_shortcuts_inhibit_v1.h
+       src/wayland/keystate.cpp
+       src/wayland/keystate.h
+       src/wayland/layershell_v1.cpp
+       src/wayland/layershell_v1.h
+       src/wayland/linuxdmabufv1clientbuffer.cpp
+       src/wayland/linuxdmabufv1clientbuffer.h
+       src/wayland/linuxdmabufv1clientbuffer_p.h
+       src/wayland/lockscreen_overlay_v1.cpp
+       src/wayland/lockscreen_overlay_v1.h
+       src/wayland/output.cpp
+       src/wayland/outputdevice_v2.cpp
+       src/wayland/outputdevice_v2.h
+       src/wayland/output.h
+       src/wayland/outputmanagement_v2.cpp
+       src/wayland/outputmanagement_v2.h
+       src/wayland/output_order_v1.cpp
+       src/wayland/output_order_v1.h
+       src/wayland/plasmashell.cpp
+       src/wayland/plasmashell.h
+       src/wayland/plasmavirtualdesktop.cpp
+       src/wayland/plasmavirtualdesktop.h
+       src/wayland/plasmawindowmanagement.cpp
+       src/wayland/plasmawindowmanagement.h
+       src/wayland/pointerconstraints_v1.cpp
+       src/wayland/pointerconstraints_v1.h
+       src/wayland/pointerconstraints_v1_p.h
+       src/wayland/pointer.cpp
+       src/wayland/pointergestures_v1.cpp
+       src/wayland/pointergestures_v1.h
+       src/wayland/pointergestures_v1_p.h
+       src/wayland/pointer.h
+       src/wayland/pointer_p.h
+       src/wayland/presentationtime.cpp
+       src/wayland/presentationtime.h
+       src/wayland/primaryselectiondevicemanager_v1.cpp
+       src/wayland/primaryselectiondevicemanager_v1.h
+       src/wayland/primaryselectiondevice_v1.cpp
+       src/wayland/primaryselectiondevice_v1.h
+       src/wayland/primaryselectionoffer_v1.cpp
+       src/wayland/primaryselectionoffer_v1.h
+       src/wayland/primaryselectionsource_v1.cpp
+       src/wayland/primaryselectionsource_v1.h
+       src/wayland/quirks.h
+       src/wayland/region.cpp
+       src/wayland/region_p.h
+       src/wayland/relativepointer_v1.cpp
+       src/wayland/relativepointer_v1.h
+       src/wayland/relativepointer_v1_p.h
+       src/wayland/screencast_v1.cpp
+       src/wayland/screencast_v1.h
+       src/wayland/screenedge_v1.cpp
+       src/wayland/screenedge_v1.h
+       src/wayland/seat.cpp
+       src/wayland/seat.h
+       src/wayland/seat_p.h
+       src/wayland/securitycontext_v1.cpp
+       src/wayland/securitycontext_v1.h
+       src/wayland/server_decoration.cpp
+       src/wayland/server_decoration.h
+       src/wayland/server_decoration_palette.cpp
+       src/wayland/server_decoration_palette.h
+       src/wayland/shadow.cpp
+       src/wayland/shadow.h
+       src/wayland/shmclientbuffer.cpp
+       src/wayland/shmclientbuffer.h
+       src/wayland/shmclientbuffer_p.h
+       src/wayland/slide.cpp
+       src/wayland/slide.h
+       src/wayland/subcompositor.cpp
+       src/wayland/subcompositor.h
+       src/wayland/subsurface_p.h
+       src/wayland/surface.cpp
+       src/wayland/surface.h
+       src/wayland/surface_p.h
+       src/wayland/tablet_v2.cpp
+       src/wayland/tablet_v2.h
+       src/wayland/tearingcontrol_v1.cpp
+       src/wayland/tearingcontrol_v1.h
+       src/wayland/textinput.cpp
+       src/wayland/textinput.h
+       src/wayland/textinput_v1.cpp
+       src/wayland/textinput_v1.h
+       src/wayland/textinput_v1_p.h
+       src/wayland/textinput_v2.cpp
+       src/wayland/textinput_v2.h
+       src/wayland/textinput_v2_p.h
+       src/wayland/textinput_v3.cpp
+       src/wayland/textinput_v3.h
+       src/wayland/textinput_v3_p.h
+       src/wayland/touch.cpp
+       src/wayland/touch.h
+       src/wayland/touch_p.h
+       src/wayland/transaction.cpp
+       src/wayland/transaction.h
+       src/wayland/transaction_p.h
+       src/wayland/viewporter.cpp
+       src/wayland/viewporter.h
+       src/wayland/viewporter_p.h
+       src/wayland/xdgactivation_v1.cpp
+       src/wayland/xdgactivation_v1.h
+       src/wayland/xdgdecoration_v1.cpp
+       src/wayland/xdgdecoration_v1.h
+       src/wayland/xdgdecoration_v1_p.h
+       src/wayland/xdgdialog_v1.cpp
+       src/wayland/xdgdialog_v1.h
+       src/wayland/xdgforeign_v2.cpp
+       src/wayland/xdgforeign_v2.h
+       src/wayland/xdgforeign_v2_p.h
+       src/wayland/xdgoutput_v1.cpp
+       src/wayland/xdgoutput_v1.h
+       src/wayland/xdgshell.cpp
+       src/wayland/xdgshell.h
+       src/wayland/xdgshell_p.h
+       src/wayland/xdgsystembell_v1.cpp
+       src/wayland/xdgsystembell_v1.h
+       src/wayland/xdgtopleveldrag_v1.cpp
+       src/wayland/xdgtopleveldrag_v1.h
+       src/wayland/xdgtoplevelicon_v1.cpp
+       src/wayland/xdgtoplevelicon_v1.h
+       src/wayland/xwaylandkeyboardgrab_v1.cpp
+       src/wayland/xwaylandkeyboardgrab_v1.h
+       src/wayland/xwaylandshell_v1.cpp
+       src/wayland/xwaylandshell_v1.h
+       tests/copyclient.cpp
+       tests/dpmstest.cpp
+       tests/paneltest.cpp
+       tests/pasteclient.cpp
+       tests/plasmasurfacetest.cpp
+       tests/pointerconstraintstest.cpp
        tests/pointerconstraintstest.h
        tests/pointerconstraintstest.qml
-Copyright: 2018, Roman Gilg <subdiff@gmail.com>
-License: LGPL-2.1+3+KDEeV
+       tests/renderingservertest.cpp
+       tests/shadowtest.cpp
+       tests/subsurfacetest.cpp
+       tests/touchclienttest.cpp
+       tests/touchclienttest.h
+       tests/waylandservertest.cpp
+       tests/xdgforeigntest.cpp
+       tests/xdgtest.cpp
+Copyright: 2020, Adrien Faveraux <ad1rie3@hotmail.fr>
+           2019-2022, Aleix Pol Gonzalez <aleixpol@kde.org>
+           2020, Benjamin Port <benjamin.port@enioka.com>
+           2020, Bhushan Shah <bshah@kde.org>
+           2014-2015, Collabora, Ltd.
+           2017-2024, David Edmundson <davidedmundson@kde.org>
+           2017-2024, David Edmundson <kde@davidedmundson.co.uk>
+           2021-2024, David Redondo <kde@david-redondo.de>
+           2018, Fredrik Höglund <fredrik@kde.org>
+           2024, Joaquim Monteiro <joaquim.monteiro@protonmail.com>
+           2023, Kai Uwe Broulik <kde@broulik.de>
+           2021, Kevin Ottens <kevin.ottens@enioka.com>
+           2015-2018, Marco Martin <mart@kde.org>
+           2015-2018, Marco Martin <notmart@gmail.com>
+           2017, Martin Flöser <mgraesslin@kde.org>
+           2014-2016, Martin Gräßlin <mgraesslin@kde.org>
+           2021, Méven Car <meven.car@enioka.com>
+           2018-2019, Roman Gilg <subdiff@gmail.com>
+           2018, Roman Glig <subdiff@gmail.com>
+           2015, Sebastian Kügler <sebas@kde.org>
+           2021, Tobias C. Berner <tcberner@FreeBSD.org>
+           2020-2023, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+           2021-2024, Xaver Hugl <xaver.hugl@gmail.com>
+           2022, Xuetian Weng <wengxt@gmail.com>
+License: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 
-Files: doc/*
-Copyright: 2018, Anne-Marie Mahfouf <annemarie.mahfouf@free.fr>
-           2015, Jost Schenck
-           2016, Lauri Watts
-           2015, Martin Graesslin <mgraesslin@kde.org>
-           2015-2016, Mike McBride
-           2018, Rik Hemsley <rik@kde.org>
-License: GFDL-NIV-1.2+
+Files: src/plugins/outputlocator/qml/OutputLabel.qml
+Copyright: 2012, Dan Vratil <dvratil@redhat.com>
+License: LGPL-2.1-or-later
+
+Files: src/wayland/tools/qtwaylandscanner.cpp
+Copyright: 2016, The Qt Company Ltd.
+License: LGPL-3.0-only
+
+Files: .clang-format
+       examples/quick-effect/package/contents/ui/main.qml
+       examples/quick-script/package/contents/ui/main.qml
+       src/helpers/killer/killer.cpp
+Copyright: 2019, Christoph Cullmann <cullmann@kde.org>
+           2019, Gernot Gebhard <gebhard@absint.com>
+           2024, Harald Sitter <sitter@kde.org>
+           2023, Kai Uwe Broulik <kde@broulik.de>
+           2003, Lubos Lunak <l.lunak@kde.org>
+           2023-2024, Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+License: MIT
+
+Files: src/wayland/protocols/wayland-drm.xml
+       src/wayland/protocols/wlr-data-control-unstable-v1.xml
+       src/wayland/protocols/wlr-layer-shell-unstable-v1.xml
+Copyright: 2008-2011 Kristian Høgsberg
+           2010-2011 Intel Corporation
+           2017 Drew DeVault
+           2018 Simon Ser
+           2019 Ivan Molodetskikh
+License: HPND-sell-variant
 
 Files: debian/*
 Copyright: 2014, Scarlett Clark <scarlett@scarlettgatelyclark.com>
            2021, Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
-           2022, Patrick Franz <deltaone@debian.org>
-License: GPL-2+
+           2022-2024, Patrick Franz <deltaone@debian.org>
+           2024, Aaron Rainbolt <arraybolt3@ubuntu.com>
+License: GPL-2.0-or-later
 
-License: BSD-3-clause
+License: BSD-2-Clause
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
  .
- 1. Redistributions of source code must retain the copyright
+ 1. Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
  .
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
 
-License: GFDL-NIV-1.2+
- Permission is granted to copy, distribute and/or modify this document
- under the terms of the GNU Free Documentation License, Version 1.2
- or any later version published by the Free Software Foundation;
- with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
- A copy of the license is included in the section entitled "GNU
- Free Documentation License".
- --
- The complete text of the GNU Free Documentation License version 1.2
- can be found in `/usr/share/common-licenses/GFDL-1.2’.
+License: BSD-3-Clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ .
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ .
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+ .
+ 3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
 
-License: GPL-2+
- This package is free software; you can redistribute it and/or modify
+License: CC0-1.0
+ To the extent possible under law, the author(s) have dedicated all
+ copyright and related and neighboring rights to this software to the
+ public domain worldwide. This software is distributed without any
+ warranty.
+ .
+ You should have received a copy of the CC0 Public Domain Dedication
+ along with this software. If not, see
+ <https://creativecommons.org/publicdomain/zero/1.0/>.
+ .
+ On Debian systems, the complete text of the CC0 Public Domain
+ Dedication can be found in `/usr/share/common-licenses/CC0-1.0’.
+
+License: GPL-2.0-only
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; version 2.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301, USA. Also add information on how to contact you by
+ electronic and paper mail.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License version 2 can be found in
+ `/usr/share/common-licenses/GPL-2’.
+
+License: GPL-2.0-or-later
+ This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
  (at your option) any later version.
  .
- This package is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
  .
  You should have received a copy of the GNU General Public License
- along with this program. If not, see <http://www.gnu.org/licenses/>
- --
- On Debian systems, the complete text of the GNU General
- Public License version 2 can be found in `/usr/share/common-licenses/GPL-2’.
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301, USA. Also add information on how to contact you by
+ electronic and paper mail.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License version 2 can be found in
+ `/usr/share/common-licenses/GPL-2’.
 
-License: GPL-2+3+KDEeV
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as
- published by the Free Software Foundation; either version 2 of
- the License or (at your option) version 3 or any later version
- accepted by the membership of KDE e.V. (or its successor approved
- by the membership of KDE e.V.), which shall act as a proxy
- defined in Section 14 of version 3 of the license.
+License: GPL-3.0-only
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GPL License as published by the Free
+ Software Foundation, version 3.
  .
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+ This package is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
  .
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- --
- On Debian systems, the complete text of the GNU General Public License
- version 2 can be found in `/usr/share/common-licenses/GPL-2’, likewise, the
- complete text of the GNU General Public License version 3 can be found in
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License version 3 can be found in
  `/usr/share/common-licenses/GPL-3’.
 
-License: LGPL-2+
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Library General Public
- License as published by the Free Software Foundation; either
- version 2 of the License, or (at your option) any later version.
+License: HPND-sell-variant
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+ provided that\n the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear in
+ supporting documentation, and that the name of the copyright holders
+ not be used in advertising or publicity pertaining to distribution
+ of the software without specific, written prior permission.  The
+ copyright holders make no representations about the suitability of
+ this software for any purpose.  It is provided "as is" without
+ express or implied warranty.
  .
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
+ THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+ SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+ RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+License: LGPL-2.0-only
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License version
+ 2 as published by the Free Software Foundation.
+ .
+ This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Library General Public License for more details.
  .
- You should have received a copy of the GNU Library General Public License
- along with this library; see the file COPYING.LIB.  If not, write to
- the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- Boston, MA 02110-1301, USA.
- --
- On Debian systems, the complete text of the GNU Library General Public
- License version 2 can be found in `/usr/share/common-licenses/LGPL-2’.
-
-License: LGPL-2.1+3+KDEeV
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) version 3, or any
- later version accepted by the membership of KDE e.V. (or its
- successor approved by the membership of KDE e.V.), which shall
- act as a proxy defined in Section 6 of version 3 of the license.
+ You should have received a copy of the GNU Library General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ 02110-1301, USA.
  .
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
+ On Debian systems, the complete text of the GNU Library General
+ Public License version 2 can be found in
+ `/usr/share/common-licenses/LGPL-2’.
+
+License: LGPL-2.0-or-later
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as
+ published by the Free Software Foundation; either version 2 of the
+ License, or (at your option)  any later version.
+ .
+ This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+ .
+ You should have received a copy of the GNU Library General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ 02110-1301, USA.
+ .
+ On Debian systems, the complete text of the GNU Library General
+ Public License version 2 can be found in
+ `/usr/share/common-licenses/LGPL-2’.
+
+License: LGPL-2.1-only
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License version
+ 2.1 as published by the Free Software Foundation.
+ .
+ This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
  .
  You should have received a copy of the GNU Lesser General Public
- License along with this library.  If not, see <https://www.gnu.org/licenses/>.
- --
- On Debian systems, the complete text of the GNU Lesser General Public License
- version 2.1 can be found in `/usr/share/common-licenses/LGPL-2.1’, likewise,
- the complete text of the GNU Lesser General Public License version 3 can be
- found in `/usr/share/common-licenses/LGPL-3’.
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301  USA Also add information on how to contact you by
+ electronic and paper mail.
+ .
+ On Debian systems, the complete text of the GNU Lesser General
+ Public License version 2.1 can be found in
+ `/usr/share/common-licenses/LGPL-2.1’.
 
-License: LGPL-2.1+3+KDEeV-translations
- This file is distributed under the license LGPL version 2.1 or
- version 3 or later versions approved by the membership of KDE e.V.
- --
- On Debian systems, the complete text of the GNU Lesser General Public License
- version 2.1 can be found in `/usr/share/common-licenses/LGPL-2.1’, likewise,
- the complete text of the GNU Lesser General Public License version 3 can be
- found in `/usr/share/common-licenses/LGPL-3’.
+License: LGPL-2.1-or-later
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as
+ published by the Free Software Foundation; either version 2.1 of the
+ License, or (at your option) any later version.
+ .
+ This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301  USA Also add information on how to contact you by
+ electronic and paper mail.
+ .
+ On Debian systems, the complete text of the GNU Lesser General
+ Public License version 2.1 can be found in
+ `/usr/share/common-licenses/LGPL-2.1’.
+
+License: LGPL-3.0-only
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License version
+ 3 as published by the Free Software Foundation.
+ .
+ This library is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library.  If not, see
+ <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU Lesser General
+ Public License version 3 can be found in
+ `/usr/share/common-licenses/LGPL-3’.
+
+License: LicenseRef-KDE-Accepted-GPL
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the license or (at
+ your option) at any later version that is accepted by the membership
+ of KDE e.V. (or its successor approved by the membership of KDE
+ e.V.), which shall act as a proxy as defined in Section 14 of
+ version 3 of the license.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+
+License: LicenseRef-KDE-Accepted-LGPL
+ This library is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as
+ published by the Free Software Foundation; either version 3 of the
+ license or (at your option) any later version that is accepted by
+ the membership of KDE e.V. (or its successor approved by the
+ membership of KDE e.V.), which shall act as a proxy as defined in
+ Section 6 of version 3 of the license.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+
+License: MIT
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation files
+ (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge,
+ publish, distribute, sublicense, and/or sell copies of the Software,
+ and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
