@@ -900,7 +900,7 @@ handles[i]=attributes->fd[i].get();
                                attributes->width,
                                attributes->height,
                                24, 32,
-                               40000,
+                               9999,
                                handles[0],
                                &framebufferId);
 //        }
